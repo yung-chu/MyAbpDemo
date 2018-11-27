@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Abp.AutoMapper" Version="4.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Domain\MyAbpDemo.Core\MyAbpDemo.Core.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\MyAbpDemo.Common\MyAbpDemo.Common.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\MyAbpDemo.EntityFrameworkCore\MyAbpDemo.EFCore.csproj" />
+  </ItemGroup>
+
+</Project>
