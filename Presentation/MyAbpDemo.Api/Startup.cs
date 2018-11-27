@@ -43,9 +43,9 @@ namespace MyAbpDemo.Api
 
                 // Configure Nlog Logging
                 //https://www.cnblogs.com/moyhui/p/9358164.html
-                //options => options.IocManager.IocContainer.AddFacility<LoggingFacility>(
-                //    f => f.UseAbpNLog().WithConfig("Nlog.config")
-                //)
+                options => options.IocManager.IocContainer.AddFacility<LoggingFacility>(
+                    f => f.UseAbpNLog().WithConfig("NLog.config")
+                )
             );
 
 

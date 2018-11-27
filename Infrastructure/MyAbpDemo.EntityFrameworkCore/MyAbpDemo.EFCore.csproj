@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <Folder Include="Mappings\" />
-    <Folder Include="Repositories\School\" />
     <Folder Include="Seeds\" />
   </ItemGroup>
 </Project>
