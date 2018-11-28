@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Abp.AspNetCore.Mvc.Controllers;
 using Abp.Dependency;
 using Abp.Web.Models;
+using Castle.Core.Logging;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MyAbpDemo.Api.Controllers

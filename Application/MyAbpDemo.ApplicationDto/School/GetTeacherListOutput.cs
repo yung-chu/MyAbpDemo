@@ -4,6 +4,9 @@ using System.Text;
 
 namespace MyAbpDemo.ApplicationDto
 {
+    /// <summary>
+    /// 老师信息
+    /// </summary>
     public class GetTeacherListOutput
     {
         /// <summary>
@@ -15,5 +18,10 @@ namespace MyAbpDemo.ApplicationDto
         /// 年纪
         /// </summary>
         public int Age { get; set; }
+
+        /// <summary>
+        /// 学生名
+        /// </summary>
+        public string StudentNames { get; set; }
     }
 }

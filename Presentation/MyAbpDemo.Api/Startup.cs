@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Abp.AspNetCore;
 using Abp.Castle.Logging.NLog;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace MyAbpDemo.Api
 {
@@ -33,6 +36,33 @@ namespace MyAbpDemo.Api
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            // https://docs.microsoft.com/zh-cn/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "ToDo API",
+                    Description = "A simple example ASP.NET Core Web API",
+                    TermsOfService = "None",
+                    Contact = new Contact
+                    {
+                        Name = "zhuyong",
+                        Email = string.Empty,
+                        Url = "https://twitter.com/spboyer"
+                    }
+               });
+
+                //显示注释
+                foreach (var file in Directory.GetFiles(AppContext.BaseDirectory, "MyAbpDemo.*.xml"))
+                {
+                    options.IncludeXmlComments(file);
+                }
+
+            });
+
+
 
             //配置Abp和依赖注入，在最后调用
             return services.AddAbp<ApiModule>(
@@ -40,14 +70,12 @@ namespace MyAbpDemo.Api
                 //options => options.IocManager.IocContainer.AddFacility<LoggingFacility>(
                 //    f => f.UseAbpLog4Net().WithConfig("log4net.config")
                 //)
-
                 // Configure Nlog Logging
                 //https://www.cnblogs.com/moyhui/p/9358164.html
                 options => options.IocManager.IocContainer.AddFacility<LoggingFacility>(
                     f => f.UseAbpNLog().WithConfig("NLog.config")
                 )
             );
-
 
         }
 
@@ -57,6 +85,7 @@ namespace MyAbpDemo.Api
             
             //初始化ABP框架和所有其他模块，这个应该首先被调用
             app.UseAbp();
+   
 
             if (env.IsDevelopment())
             {
@@ -69,6 +98,15 @@ namespace MyAbpDemo.Api
 
             app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseStaticFiles();
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
+
         }
     }
 }
