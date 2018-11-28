@@ -11,6 +11,7 @@ namespace MyAbpDemo.EFCore
         public TeacherRepository(IDbContextProvider<MyAbpDemoDbContext> dbContextProvider)
             : base(dbContextProvider)
         {
+
         }
     }
 }
