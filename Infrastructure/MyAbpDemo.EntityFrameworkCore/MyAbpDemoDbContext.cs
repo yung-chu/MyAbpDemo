@@ -43,8 +43,14 @@ namespace MyAbpDemo.EFCore
                 TeacherId = 1
             });
 
-
-
+            modelBuilder.Entity<Student>().HasData(new Student()
+            {
+                Id=2,
+                Name = "学生2",
+                Age = 36,
+                IsActive = true,
+                TeacherId = 1
+            });
         }
     }
 }
