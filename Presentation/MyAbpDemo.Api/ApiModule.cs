@@ -9,13 +9,14 @@ using Abp.Runtime.Caching.Redis;
 using Microsoft.Extensions.Configuration;
 using MyAbpDemo.Application;
 using MyAbpDemo.Core;
+using MyAbpDemo.Infrastructure.Api;
 
 namespace MyAbpDemo.Api
 {
     /// <summary>
     /// AbpAspNetCoreModule
     /// </summary>
-    [DependsOn(typeof(ApplicationModule),typeof(AbpRedisCacheModule),typeof(AbpAspNetCoreModule))]
+    [DependsOn(typeof(ApplicationModule),typeof(InfrastructureApiModule),typeof(AbpRedisCacheModule),typeof(AbpAspNetCoreModule))]
     public class ApiModule:AbpModule
     {
         public override void PreInitialize()

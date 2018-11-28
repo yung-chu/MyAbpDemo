@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MyAbpDemo.Common\MyAbpDemo.Common.csproj" />
+    <ProjectReference Include="..\MyAbpDemo.EntityFrameworkCore\MyAbpDemo.EFCore.csproj" />
   </ItemGroup>
 
 </Project>
