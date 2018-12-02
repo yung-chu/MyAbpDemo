@@ -58,23 +58,23 @@ namespace MyAbpDemo.EFCore.Migrations
                         column: x => x.TeacherId,
                         principalTable: "Teachers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
                 table: "Teachers",
                 columns: new[] { "Id", "Age", "CreationTime", "CreatorUserId", "DeleterUserId", "DeletionTime", "IsActive", "IsDeleted", "IsReview", "LastModificationTime", "LastModifierUserId", "Name" },
-                values: new object[] { 1L, 18, new DateTime(2018, 11, 28, 22, 16, 31, 939, DateTimeKind.Local), null, null, null, true, false, true, null, null, "朱老师" });
+                values: new object[] { 1L, 18, new DateTime(2018, 12, 2, 21, 52, 48, 309, DateTimeKind.Local), null, null, null, true, false, true, null, null, "朱老师" });
 
             migrationBuilder.InsertData(
                 table: "Students",
                 columns: new[] { "Id", "Age", "CreationTime", "CreatorUserId", "DeleterUserId", "DeletionTime", "IsActive", "IsDeleted", "LastModificationTime", "LastModifierUserId", "LearnLevel", "Name", "TeacherId" },
-                values: new object[] { 1L, 18, new DateTime(2018, 11, 28, 22, 16, 31, 942, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)2, "学生1", 1L });
+                values: new object[] { 1L, 18, new DateTime(2018, 12, 2, 21, 52, 48, 311, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)1, "学生1", 1L });
 
             migrationBuilder.InsertData(
                 table: "Students",
                 columns: new[] { "Id", "Age", "CreationTime", "CreatorUserId", "DeleterUserId", "DeletionTime", "IsActive", "IsDeleted", "LastModificationTime", "LastModifierUserId", "LearnLevel", "Name", "TeacherId" },
-                values: new object[] { 2L, 36, new DateTime(2018, 11, 28, 22, 16, 31, 942, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)2, "学生2", 1L });
+                values: new object[] { 2L, 36, new DateTime(2018, 12, 2, 21, 52, 48, 312, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)4, "学生2", 1L });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Students_TeacherId",

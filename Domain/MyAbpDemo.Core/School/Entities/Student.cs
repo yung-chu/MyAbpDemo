@@ -31,16 +31,9 @@ namespace MyAbpDemo.Core
         /// <summary>
         /// 评级
         /// </summary>
-        public LearnLevel LearnLevel { get; protected set; } = LearnLevel.Standard;
+        public LearnLevel LearnLevel { get; set; } = LearnLevel.Standard;
 
-        /// <summary>
-        /// 更改评级内部方法
-        /// </summary>
-        /// <param name="learnLevel"></param>
-        internal void ChangeLearnLevel(LearnLevel learnLevel)
-        {
-            this.LearnLevel = learnLevel;
-        }
+
 
         public long TeacherId { get; set; }
 

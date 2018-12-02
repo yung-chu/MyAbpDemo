@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyAbpDemo.EFCore;
 
-namespace MyAbpDemo.EFCore
+namespace MyAbpDemo.EFCore.Migrations
 {
     [DbContext(typeof(MyAbpDemoDbContext))]
     partial class MyAbpDemoDbContextModelSnapshot : ModelSnapshot
@@ -58,7 +58,8 @@ namespace MyAbpDemo.EFCore
                     b.ToTable("Students");
 
                     b.HasData(
-                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2018, 11, 26, 16, 18, 56, 400, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)2, Name = "学生1", TeacherId = 1L }
+                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2018, 12, 2, 21, 52, 48, 311, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)1, Name = "学生1", TeacherId = 1L },
+                        new { Id = 2L, Age = 36, CreationTime = new DateTime(2018, 12, 2, 21, 52, 48, 312, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)4, Name = "学生2", TeacherId = 1L }
                     );
                 });
 
@@ -97,7 +98,7 @@ namespace MyAbpDemo.EFCore
                     b.ToTable("Teachers");
 
                     b.HasData(
-                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2018, 11, 26, 16, 18, 56, 398, DateTimeKind.Local), IsActive = true, IsDeleted = false, IsReview = true, Name = "朱老师" }
+                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2018, 12, 2, 21, 52, 48, 309, DateTimeKind.Local), IsActive = true, IsDeleted = false, IsReview = true, Name = "朱老师" }
                     );
                 });
 
@@ -106,7 +107,7 @@ namespace MyAbpDemo.EFCore
                     b.HasOne("MyAbpDemo.Core.Teacher", "Teacher")
                         .WithMany("Students")
                         .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 #pragma warning restore 612, 618
         }

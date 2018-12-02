@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using Abp.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -22,35 +24,21 @@ namespace MyAbpDemo.EFCore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //teacher 
-            modelBuilder.Entity<Teacher>().HasData(new Teacher()
-            {
-                Id = 1,
-                Name = "朱老师",
-                Age = 18,
-                IsActive = true,
-                IsReview = true
+            base.OnModelCreating(modelBuilder);
 
-            });
+            //https://www.learnentityframeworkcore.com/configuration/fluent-api
+            //fluent api
+            var typesToRegister = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(q => q.GetInterface(typeof(IEntityTypeConfiguration<>).FullName) != null);
 
-            //student
-            modelBuilder.Entity<Student>().HasData(new Student()
+            foreach (var type in typesToRegister)
             {
-                Id = 1,
-                Name = "学生1",
-                Age = 18,
-                IsActive = true,
-                TeacherId = 1
-            });
+                dynamic configurationInstance = Activator.CreateInstance(type);
+                modelBuilder.ApplyConfiguration(configurationInstance);
+            }
 
-            modelBuilder.Entity<Student>().HasData(new Student()
-            {
-                Id=2,
-                Name = "学生2",
-                Age = 36,
-                IsActive = true,
-                TeacherId = 1
-            });
+            //初始化数据
+            modelBuilder.Seed();
         }
     }
 }
