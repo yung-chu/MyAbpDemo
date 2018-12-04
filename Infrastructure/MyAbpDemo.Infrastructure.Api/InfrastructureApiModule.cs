@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
-using MyAbpDemo.EFCore;
 
 namespace MyAbpDemo.Infrastructure.Api
 {
-    [DependsOn(typeof(EfCoreModule))]
+    [DependsOn(typeof(InfrastructureModule))]
     public class InfrastructureApiModule: AbpModule
     {
         /// <summary>

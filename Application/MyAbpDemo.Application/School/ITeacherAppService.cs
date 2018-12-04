@@ -4,11 +4,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using MyAbpDemo.ApplicationDto;
+using MyAbpDemo.Infrastructure;
 
 namespace MyAbpDemo.Application
 {
     public interface ITeacherAppService: IApplicationService
     {
-        Task<List<GetTeacherListOutput>> GetTeacherList();
+        Task<Result<List<GetTeacherListOutput>>> GetTeacherList();
     }
 }

@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MyAbpDemo.EFCore;
 
-namespace MyAbpDemo.EFCore.Migrations
+
+namespace MyAbpDemo.Infrastructure.EFCore
 {
     [DbContext(typeof(MyAbpDemoDbContext))]
     [Migration("20181202135248_init")]

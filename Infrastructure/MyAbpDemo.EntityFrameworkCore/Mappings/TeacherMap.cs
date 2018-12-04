@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MyAbpDemo.Core;
 
-namespace MyAbpDemo.EFCore.Mappings
+namespace MyAbpDemo.Infrastructure.EFCore
 {
     public class TeacherMap : IEntityTypeConfiguration<Teacher>
     {

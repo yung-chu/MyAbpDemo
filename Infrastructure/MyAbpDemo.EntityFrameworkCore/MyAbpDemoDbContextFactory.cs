@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 
-namespace MyAbpDemo.EFCore
+namespace MyAbpDemo.Infrastructure.EFCore
 {
     /// <summary>
     /// 设计时 DbContext 创建

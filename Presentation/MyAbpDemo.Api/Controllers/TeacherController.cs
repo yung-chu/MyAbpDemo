@@ -7,6 +7,7 @@ using MyAbpDemo.Application;
 using Castle.Core.Logging;
 using Microsoft.AspNetCore.Http;
 using MyAbpDemo.ApplicationDto;
+using MyAbpDemo.Infrastructure;
 
 //1: 导入日志的命名空间，Castle.Core.Logging
 
@@ -31,12 +32,16 @@ namespace MyAbpDemo.Api.Controllers
         /// <response code="400">失败返回Result对象</response>  
         [HttpGet("teachers")]
         [ProducesResponseType(typeof(List<GetTeacherListOutput>),StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Result),StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetTeacher()
         {
             //Logger.Info("记录日志: "+DateTime.Now );
-            var list =await  _teacherAppService.GetTeacherList();
-            return   Ok(list);
+            var result =await  _teacherAppService.GetTeacherList();
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(new Result(result.Code, result.Message));
         }
     }
 }

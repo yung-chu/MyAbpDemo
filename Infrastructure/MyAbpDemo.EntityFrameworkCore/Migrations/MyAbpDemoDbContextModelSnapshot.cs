@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MyAbpDemo.EFCore;
 
-namespace MyAbpDemo.EFCore.Migrations
+
+namespace MyAbpDemo.Infrastructure.EFCore
 {
     [DbContext(typeof(MyAbpDemoDbContext))]
     partial class MyAbpDemoDbContextModelSnapshot : ModelSnapshot

@@ -7,7 +7,7 @@ using Abp.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MyAbpDemo.Core;
 
-namespace MyAbpDemo.EFCore
+namespace MyAbpDemo.Infrastructure.EFCore
 {
     public class MyAbpDemoDbContext : AbpDbContext
     {

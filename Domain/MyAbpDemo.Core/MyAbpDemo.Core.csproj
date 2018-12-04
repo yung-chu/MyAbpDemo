@@ -12,8 +12,4 @@
     <PackageReference Include="Abp" Version="4.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="School\DomainServices\" />
-  </ItemGroup>
-
 </Project>

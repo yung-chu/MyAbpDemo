@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace MyAbpDemo.EFCore.Migrations
+namespace MyAbpDemo.Infrastructure.EFCore
 {
     public partial class init : Migration
     {

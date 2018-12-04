@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -8,14 +8,11 @@
     <DocumentationFile>bin\Debug\netcoreapp2.1\MyAbpDemo.ApplicationDto.xml</DocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Abp.AutoMapper" Version="4.0.2" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Domain\MyAbpDemo.Core\MyAbpDemo.Core.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\MyAbpDemo.Common\MyAbpDemo.Common.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\MyAbpDemo.EntityFrameworkCore\MyAbpDemo.EFCore.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\MyAbpDemo.EntityFrameworkCore\MyAbpDemo.Infrastructure.EFCore.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\MyAbpDemo.Infrastructure\MyAbpDemo.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,7 +7,7 @@ using Abp.EntityFrameworkCore.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace MyAbpDemo.EFCore
+namespace MyAbpDemo.Infrastructure.EFCore
 {
     //https://github.com/ABPFrameWorkGroup/AbpDocument2Chinese/blob/master/Markdown/Abp/9.3ABP%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%E5%B1%82-%E9%9B%86%E6%88%90EntityFrameworkCore.md#%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BB%93%E5%82%A8
     public class MyAbpDemoRepositoryBase<TEntity, TPrimaryKey> : EfCoreRepositoryBase<MyAbpDemoDbContext, TEntity, TPrimaryKey>

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Abp.AspNetCore;
 using Abp.Castle.Logging.NLog;
 using Castle.Facilities.Logging;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -15,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MyAbpDemo.Infrastructure;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace MyAbpDemo.Api
@@ -34,7 +36,13 @@ namespace MyAbpDemo.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+               services.AddMvc(option =>
+               {
+                    //option.Filters.Add();
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
+
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             // https://docs.microsoft.com/zh-cn/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio
@@ -62,6 +70,12 @@ namespace MyAbpDemo.Api
 
             });
 
+            //模型验证自定义结果输出
+            //https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-2.1
+            //https://www.strathweb.com/2018/02/exploring-the-apicontrollerattribute-and-its-features-for-asp-net-core-mvc-2-1/
+            services.Configure<ApiBehaviorOptions>(options =>
+              options.InvalidModelStateResponseFactory = InvalidModelStateExecutor.Executer
+            );
 
 
             //配置Abp和依赖注入，在最后调用
@@ -85,7 +99,7 @@ namespace MyAbpDemo.Api
             
             //初始化ABP框架和所有其他模块，这个应该首先被调用
             app.UseAbp();
-   
+            
 
             if (env.IsDevelopment())
             {

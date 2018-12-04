@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using MyAbpDemo.Core;
 
-namespace MyAbpDemo.Core
+namespace MyAbpDemo.Infrastructure.EFCore
 {
     public static class ModelBuilderExtensions
     {

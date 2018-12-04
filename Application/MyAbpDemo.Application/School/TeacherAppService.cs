@@ -6,6 +6,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using MyAbpDemo.ApplicationDto;
 using MyAbpDemo.Core;
+using MyAbpDemo.Infrastructure;
 
 namespace MyAbpDemo.Application.School
 {
@@ -18,9 +19,10 @@ namespace MyAbpDemo.Application.School
             _teacherRepository = teacherRepository;
         }
 
-        public async Task<List<GetTeacherListOutput>> GetTeacherList()
+        public async Task<Result<List<GetTeacherListOutput>>> GetTeacherList()
         {
-            return await _teacherRepository.GetAll().ProjectTo<GetTeacherListOutput>().ToListAsync(); 
+            var result= await _teacherRepository.GetAll().ProjectTo<GetTeacherListOutput>().ToListAsync();
+            return Result.FromData(result);
         }
     }
 }

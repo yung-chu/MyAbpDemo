@@ -5,8 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyAbpDemo.Common\MyAbpDemo.Common.csproj" />
-    <ProjectReference Include="..\MyAbpDemo.EntityFrameworkCore\MyAbpDemo.EFCore.csproj" />
+    <PackageReference Include="Abp.AspNetCore" Version="4.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyAbpDemo.Infrastructure\MyAbpDemo.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Filters\" />
   </ItemGroup>
 
 </Project>

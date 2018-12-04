@@ -3,7 +3,7 @@ using Abp.AutoMapper;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
 using MyAbpDemo.Core;
-using MyAbpDemo.EFCore;
+using MyAbpDemo.Infrastructure.EFCore;
 
 namespace MyAbpDemo.ApplicationDto
 {

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MyAbpDemo.Core;
 
-namespace MyAbpDemo.EFCore.Mappings
+namespace MyAbpDemo.Infrastructure.EFCore
 {
     //https://stackoverflow.com/questions/26957519/ef-core-mapping-entitytypeconfiguration
 
