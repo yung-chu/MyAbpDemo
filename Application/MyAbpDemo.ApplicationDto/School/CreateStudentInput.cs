@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Abp.AutoMapper;
 using MyAbpDemo.Core;
 
 namespace MyAbpDemo.ApplicationDto
@@ -9,6 +10,7 @@ namespace MyAbpDemo.ApplicationDto
     /// <summary>
     /// 创建学生
     /// </summary>
+    [AutoMapTo(typeof(Student))]    // CreateStudentInput mapTo Student
     public class CreateStudentInput
     {
        /// <summary>

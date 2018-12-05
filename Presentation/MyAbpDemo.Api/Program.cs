@@ -20,7 +20,6 @@ namespace MyAbpDemo.Api
 
             try
             {
-                logger.Debug("init main");
                 CreateWebHostBuilder(args).Build().Run();
             }
             catch (Exception e)

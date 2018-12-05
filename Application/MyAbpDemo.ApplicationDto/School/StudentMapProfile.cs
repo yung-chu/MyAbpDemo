@@ -12,8 +12,11 @@ namespace MyAbpDemo.ApplicationDto
     {
         public StudentMapProfile()
         {
+
             CreateMap<ImportStudent, Student>()
                 .ForMember(dest => dest.LearnLevel, opt => opt.ResolveUsing<CustomResolver>());
+
+
         }
 
         /// <summary>

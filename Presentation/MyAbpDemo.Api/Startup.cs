@@ -17,6 +17,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MyAbpDemo.Infrastructure;
+using MyAbpDemo.Infrastructure.Api;
+using MyAbpDemo.Infrastructure.Api.Filters;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace MyAbpDemo.Api
@@ -36,13 +38,15 @@ namespace MyAbpDemo.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-               services.AddMvc(option =>
-               {
-                    //option.Filters.Add();
+            //添加筛选器
+            //https://docs.microsoft.com/zh-cn/aspnet/core/mvc/controllers/filters?view=aspnetcore-2.1#action-filters
+            services.AddMvc(option =>
+                {
+                    option.Filters.Add(typeof(MyActionFilter)); 
+                    option.Filters.Add(typeof(MyAbpExceptionFilter));
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
-
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             // https://docs.microsoft.com/zh-cn/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio
@@ -58,7 +62,7 @@ namespace MyAbpDemo.Api
                     {
                         Name = "zhuyong",
                         Email = string.Empty,
-                        Url = "https://twitter.com/spboyer"
+                        Url = "www.baidu.com"
                     }
                });
 
@@ -76,6 +80,18 @@ namespace MyAbpDemo.Api
             services.Configure<ApiBehaviorOptions>(options =>
               options.InvalidModelStateResponseFactory = InvalidModelStateExecutor.Executer
             );
+
+            //注册的 CORS 服务
+            services.AddCors(builder =>
+            {
+                var host = Configuration.GetValue<string>("AllowedHosts")?.Split(";");
+                builder.AddDefaultPolicy(p =>
+                {
+                    p.WithOrigins(host)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+             });
 
 
             //配置Abp和依赖注入，在最后调用
@@ -110,6 +126,7 @@ namespace MyAbpDemo.Api
                 app.UseHsts();
             }
 
+            app.UseCors();//跨域
             app.UseHttpsRedirection();
             app.UseMvc();
             app.UseStaticFiles();
