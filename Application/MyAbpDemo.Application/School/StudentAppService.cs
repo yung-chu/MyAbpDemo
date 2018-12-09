@@ -66,9 +66,9 @@ namespace MyAbpDemo.Application
         /// </summary>
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
-        public async Task<Result<List<ValidatorErrorInfo>>> Import(IFormFile uploadedFile)
+        public async Task<Result> Import(IFormFile uploadedFile)
         {
-            var result = Result.Fail<List<ValidatorErrorInfo>>(ResultCode.Fail);
+            var result = new Result(ResultCode.Ok);
 
             if (uploadedFile == null)
             {
@@ -104,7 +104,7 @@ namespace MyAbpDemo.Application
             if (validatorErrorInfos.Any())
             {
                 result.Code = ResultCode.ParameterFailed;
-                result.Data = validatorErrorInfos;
+                result.Message = validatorErrorInfos.GetValidatorErrorStr();
                 return result;
             }
 

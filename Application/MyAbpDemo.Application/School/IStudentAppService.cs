@@ -35,7 +35,7 @@ namespace MyAbpDemo.Application
         /// </summary>
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
-        Task<Result<List<ValidatorErrorInfo>>> Import(IFormFile uploadedFile);
+        Task<Result> Import(IFormFile uploadedFile);
 
         /// <summary>
         /// excel合并单元格分组导入

@@ -62,7 +62,7 @@ namespace MyAbpDemo.Api.Controllers
             {
                 return Ok(result);
             }
-            return BadRequest(new Result(result.Code, result.Message));
+            return BadRequest(result.BaseResult());
         }
 
 
@@ -118,7 +118,7 @@ namespace MyAbpDemo.Api.Controllers
                 return Ok();
             }
 
-            return BadRequest(result.Data);
+            return BadRequest(result.BaseResult());
         }
     }
 }
