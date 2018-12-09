@@ -14,6 +14,11 @@ namespace MyAbpDemo.Core
     /// </summary>
     public interface IStudentDomainService: IDomainService
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="student"></param>
+        /// <returns></returns>
         Task CreateStudent(Student student);
     }
 }

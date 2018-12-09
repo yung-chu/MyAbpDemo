@@ -87,6 +87,7 @@ namespace MyAbpDemo.Application
             var validatorErrorInfos = new List<ValidatorErrorInfo>();
             List<ImportStudent> list = EpplusHelper.Import<ImportStudent>(uploadedFile, validatorErrorInfos);
 
+            //逻辑校验
             if (!validatorErrorInfos.Any())
             {
                 //校验老师编码

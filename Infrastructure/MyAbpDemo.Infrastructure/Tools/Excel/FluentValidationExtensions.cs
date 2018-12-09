@@ -38,7 +38,7 @@ namespace MyAbpDemo.Infrastructure
                         (
                             new ErrorDetail
                             {
-                                Colum = propertyNames.IndexOf(errorInfo.PropertyName).ToString(),
+                                Column = (propertyNames.IndexOf(errorInfo.PropertyName)+1).ToString(),
                                 ErrorMsg = errorInfo.ErrorMessage
                             }
                         );

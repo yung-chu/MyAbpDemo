@@ -67,8 +67,8 @@ namespace MyAbpDemo.Infrastructure
             #endregion
 
               #region 数据类型检测、数据范围
-                 List<T> list = new List<T>();
-                 var totalRows = rows.Skip(1).ToList();//去掉首行标题
+                List<T> list = new List<T>();
+                var totalRows = rows.Skip(1).ToList();//去掉首行标题
 
                 if (!rows.Any())
                 {
@@ -101,7 +101,7 @@ namespace MyAbpDemo.Infrastructure
                     var tnew = new T();
                     var errorInfoItem = new ValidatorErrorInfo
                     {
-                        Row = row.ToString(),
+                        Row = (row-1).ToString(),
                         ErrorDetails = new List<ErrorDetail>()
                     };
 
@@ -203,9 +203,12 @@ namespace MyAbpDemo.Infrastructure
                     //错误信息
                     errorInfo.Add(errorInfoItem);
                 }
-            #endregion
 
-              return list;
+               //错误信息处理(移除创建多余实例对象)        
+               errorInfo.RemoveAll(a => !a.ErrorDetails.Any());
+              #endregion
+
+            return list;
         }
 
         /// <summary>
@@ -244,7 +247,7 @@ namespace MyAbpDemo.Infrastructure
         {
             validatorErrorInfo.ErrorDetails.Add(new ErrorDetail
             {
-                Colum = col.ToString(),
+                Column = col.ToString(),
                 ErrorMsg = errorMsg
             });
         }

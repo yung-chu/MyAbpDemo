@@ -109,7 +109,7 @@ namespace MyAbpDemo.Api.Controllers
         [HttpPost]
         [Route("import")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(List<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(List<ValidatorErrorInfo>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Import(IFormFile uploadedFile)
         {
             var result =await _studentAppService.Import(uploadedFile);
@@ -118,7 +118,7 @@ namespace MyAbpDemo.Api.Controllers
                 return Ok();
             }
 
-            return BadRequest(result.Message.TrimEnd(';').Split(";").ToList());
+            return BadRequest(result.Data);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace MyAbpDemo.Api
         public override void PreInitialize()
         {
             //配置使用Redis缓存
-            Configuration.Caching.UseRedis();
+           // Configuration.Caching.UseRedis();
             //如果Redis在本机,并且使用的默认端口,下面的代码可以不要
             //Configuration.Modules.AbpRedisCacheModule().ConnectionStringKey = "KeyName";
 

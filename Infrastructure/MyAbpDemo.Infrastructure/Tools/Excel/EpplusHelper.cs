@@ -87,10 +87,11 @@ namespace MyAbpDemo.Infrastructure
 
         /// <summary>
         /// 使用EPPlus导入Excel(xlsx)
+        /// 基本校验
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="uploadedFile">请求文件</param>
-        /// <param name="errorMsg">错误列表</param>
+        /// <param name="errorMsg">基本校验错误列表</param>
         /// <returns></returns>
         public static List<T> Import<T>(IFormFile uploadedFile, List<ValidatorErrorInfo> errorMsg) where T : new()
         {

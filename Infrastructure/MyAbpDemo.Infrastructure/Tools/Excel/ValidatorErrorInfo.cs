@@ -4,7 +4,9 @@ using System.Text;
 
 namespace MyAbpDemo.Infrastructure
 {
-    //excel 错误校验信息
+    /// <summary>
+    /// excel 错误校验信息
+    /// </summary>
     public class ValidatorErrorInfo
     {
         /// <summary>
@@ -23,7 +25,7 @@ namespace MyAbpDemo.Infrastructure
         /// <summary>
         /// 列
         /// </summary>
-        public string Colum { get; set; }
+        public string Column{ get; set; }
 
         /// <summary>
         /// 错误信息
