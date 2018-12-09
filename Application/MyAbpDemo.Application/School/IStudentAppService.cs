@@ -35,6 +35,13 @@ namespace MyAbpDemo.Application
         /// </summary>
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
-        Task<Result> Import(IFormFile uploadedFile);
+        Task<Result<List<ValidatorErrorInfo>>> Import(IFormFile uploadedFile);
+
+        /// <summary>
+        /// excel合并单元格分组导入
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        Result GroupImport(IFormFile uploadedFile);
     }
 }

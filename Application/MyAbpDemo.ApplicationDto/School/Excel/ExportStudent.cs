@@ -41,4 +41,14 @@ namespace MyAbpDemo.ApplicationDto
         [DisplayName("老师名字")]
         public string TeacherName { get; set; }
     }
+
+    /// <summary>
+    /// excel 导出错误信息
+    /// DisplayName为Excel标题列
+    /// </summary>
+    public class ExportStudentWithError: ExportStudent
+    {
+        [DisplayName("错误信息")]
+        public string ErrorMessage { get; set; }
+    }
 }

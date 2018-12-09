@@ -92,7 +92,7 @@ namespace MyAbpDemo.Infrastructure
         /// <param name="uploadedFile">请求文件</param>
         /// <param name="errorMsg">错误列表</param>
         /// <returns></returns>
-        public static List<T> Import<T>(IFormFile uploadedFile, ref StringBuilder errorMsg) where T : new()
+        public static List<T> Import<T>(IFormFile uploadedFile, List<ValidatorErrorInfo> errorMsg) where T : new()
         {
             using (ExcelPackage package = new ExcelPackage(uploadedFile.OpenReadStream()))
             {
@@ -100,7 +100,7 @@ namespace MyAbpDemo.Infrastructure
                 if (workSheetList.Any())//是否有sheet
                 {
                     ExcelWorksheet workSheet = workSheetList[1];//取第一个sheet
-                    return workSheet.ConvertSheetToObjects<T>(ref errorMsg);
+                    return workSheet.ConvertSheetToObjects<T>(errorMsg);
                 }
             }
             return new List<T>();

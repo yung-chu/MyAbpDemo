@@ -11,6 +11,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\" />
     <Folder Include="Swagger\" />
+    <Folder Include="wwwroot\ExcelTemplate\" />
   </ItemGroup>
 
   <ItemGroup>

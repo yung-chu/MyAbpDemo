@@ -10,30 +10,45 @@ namespace MyAbpDemo.Infrastructure
     public static class FluentValidationExtensions
     {
         /// <summary>
-        /// 导入数据检验
+        /// 导入数据时检验
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="validator"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static StringBuilder GetObjectValidatorError<T>(this AbstractValidator<T> validator, List<T> list)
+        public static List<ValidatorErrorInfo> GetObjectValidatorError<T>(this AbstractValidator<T> validator, List<T> list)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            List<ValidatorErrorInfo> errorList = new List<ValidatorErrorInfo>();
+            var propertyNames = typeof(T).GetProperties().Select(a => a.Name).ToList();
+
             foreach (var item in list)
             {
-                int currentRow = list.IndexOf(item) + 1;
                 ValidationResult results = validator.Validate(item);
-
                 if (!results.IsValid)
                 {
-                    results.Errors.Select(a => a.ErrorMessage).ToList().ForEach(errorMsg =>
+                    var errorInfoItem = new ValidatorErrorInfo
                     {
-                        stringBuilder.Append($"第{currentRow}行:{errorMsg};");
-                    });
+                        Row = (list.IndexOf(item) + 1).ToString(),
+                        ErrorDetails = new List<ErrorDetail>()
+                    };
+
+                    foreach (var errorInfo in results.Errors)
+                    {
+                        errorInfoItem.ErrorDetails.Add
+                        (
+                            new ErrorDetail
+                            {
+                                Colum = propertyNames.IndexOf(errorInfo.PropertyName).ToString(),
+                                ErrorMsg = errorInfo.ErrorMessage
+                            }
+                        );
+                    }
+
+                    errorList.Add(errorInfoItem);
                 }
             }
 
-            return stringBuilder;
+            return errorList;
         }
     }
 }

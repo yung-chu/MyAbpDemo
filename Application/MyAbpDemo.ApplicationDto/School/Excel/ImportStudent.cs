@@ -23,4 +23,19 @@ namespace MyAbpDemo.ApplicationDto
         [DisplayName("老师编号")]
         public int TeacherId { get; set; }
     }
+
+    /// <summary>
+    /// test excel import
+    /// </summary>
+    public class GroupImport
+    {
+        [DisplayName("数量")]
+        public int Count { get; set; }
+
+        [DisplayName("商品条码")]
+        public string BarCode { get; set; }
+
+        [DisplayName("折扣价")]
+        public decimal Price { get; set; }
+    }
 }

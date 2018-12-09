@@ -25,10 +25,11 @@ namespace MyAbpDemo.Infrastructure
         /// </summary>
         public const int MaxColumns = ExcelPackage.MaxColumns;
 
-        public static List<T> ConvertSheetToObjects<T>(this ExcelWorksheet worksheet, ref StringBuilder stringBuilder) where T : new()
+        public static List<T> ConvertSheetToObjects<T>(this ExcelWorksheet worksheet, List<ValidatorErrorInfo> errorInfo) where T : new()
         {
-                //对象所有列属性
-                List<PropertyInfoModel> columns = new List<PropertyInfoModel>();
+              #region 准备条件
+               //对象所有列属性
+               List<PropertyInfoModel> columnPropertyInfos = new List<PropertyInfoModel>();
                 var properties = typeof(T).GetProperties().ToList();
                 foreach (var propertyInfo in properties)
                 {
@@ -36,7 +37,7 @@ namespace MyAbpDemo.Infrastructure
                     var displayNameAttribute = Attribute.GetCustomAttribute(propertyInfo, typeof(DisplayNameAttribute));
                     var columnName = displayNameAttribute == null ? string.Empty : ((DisplayNameAttribute)displayNameAttribute).DisplayName.Trim();
 
-                    columns.Add(new PropertyInfoModel
+                    columnPropertyInfos.Add(new PropertyInfoModel
                     {
                         Property = propertyInfo,
                         Column = column,
@@ -54,50 +55,57 @@ namespace MyAbpDemo.Infrastructure
                var columnNames = new List<string>();
                var cellRows = worksheet.Cells[worksheet.Dimension.Start.Row, worksheet.Dimension.Start.Column, 1,
                     worksheet.Dimension.End.Column];
-               foreach (var firstRowCell in cellRows)
+
+               foreach (var cellRow in cellRows)
                {
-                   string text = firstRowCell.Text.Trim();
+                   string text = cellRow.Text.Trim();
                    if (text != "")
                    {
                        columnNames.Add(text);
                    }
                }
+            #endregion
 
-               List<T> list = new List<T>();
-               var totalRows = rows.Skip(1).ToList();//去掉首行标题
+              #region 数据类型检测、数据范围
+                 List<T> list = new List<T>();
+                 var totalRows = rows.Skip(1).ToList();//去掉首行标题
 
-               #region 数据类型检测、数据范围(错误信息以逗号分隔)
                 if (!rows.Any())
                 {
-                    stringBuilder.Append("excel无数据,请下载模板重新上传");
+                    GetExcelDetailError(errorInfo, "excel无数据,请下载模板重新上传");
                     return list;
                 }
                 else if (!totalRows.Any())
                 {
-                    stringBuilder.Append("excel无数据,请重新上传");
+                    GetExcelDetailError(errorInfo, "excel无数据,请重新上传");
                     return list;
                 }
                 if (totalRows.First() > MaxRows)
                 {
-                    stringBuilder.AppendFormat("数据量过大,超过{0},请重新上传", ExcelPackage.MaxRows);
+                    GetExcelDetailError(errorInfo, $"数据量过大,超过{ExcelPackage.MaxRows},请重新上传");
                     return list;
                 }
                 if (columnNames.Count > MaxColumns)
                 {
-                    stringBuilder.AppendFormat("列名太长,超过{0},请重新上传", ExcelPackage.MaxColumns);
+                    GetExcelDetailError(errorInfo, $"列名太长,超过{ExcelPackage.MaxColumns},请重新上传");
                     return list;
                 }
-                if (!columns.Select(a => a.ColumnName).SequenceEqual(columnNames))
+                if (!columnPropertyInfos.Select(a => a.ColumnName).SequenceEqual(columnNames))
                 {
-                    stringBuilder.AppendFormat("excel标题与模板标题不一致，请下载模板重新上传");
+                    GetExcelDetailError(errorInfo, "excel标题与模板标题不一致，请下载模板重新上传");
                     return list;
                 }
 
                 foreach (var row in totalRows)
                 {
                     var tnew = new T();
+                    var errorInfoItem = new ValidatorErrorInfo
+                    {
+                        Row = row.ToString(),
+                        ErrorDetails = new List<ErrorDetail>()
+                    };
 
-                    foreach (var col in columns)
+                    foreach (var col in columnPropertyInfos)
                     {
                         var val = worksheet.Cells[row, col.Column];
 
@@ -109,7 +117,7 @@ namespace MyAbpDemo.Infrastructure
                         {
                             if (!short.TryParse(val.Value.ToString(), out short a))
                             {
-                                stringBuilder.Append($"第{row}行,第{col.Column}列数据格式不是整型;");
+                                GetDataCheckError(errorInfoItem, col.Column, "数据格式不是数字");
                             }
                             else
                             {
@@ -126,7 +134,7 @@ namespace MyAbpDemo.Infrastructure
 
                             if (!int.TryParse(val.Value.ToString(), out int a))
                             {
-                                stringBuilder.Append($"第{row}行,第{col.Column}列数据格式不是整型;");
+                                GetDataCheckError(errorInfoItem, col.Column, "数据格式不是数字");
                             }
                             else
                             {
@@ -137,7 +145,7 @@ namespace MyAbpDemo.Infrastructure
                         {
                             if (!long.TryParse(val.Value.ToString(), out long a))
                             {
-                                stringBuilder.Append($"第{row}行,第{col.Column}列数据格式不是长整型;");
+                              GetDataCheckError(errorInfoItem, col.Column, "数据格式不是数字");
                             }
                             else
                             {
@@ -148,7 +156,7 @@ namespace MyAbpDemo.Infrastructure
                         {
                             if (!decimal.TryParse(val.Value.ToString(), out decimal a))
                             {
-                                stringBuilder.Append($"第{row}行,第{col.Column}列数据格式不是数字型;");
+                              GetDataCheckError(errorInfoItem, col.Column, "数据格式不是数字");
                             }
                             else
                             {
@@ -159,7 +167,7 @@ namespace MyAbpDemo.Infrastructure
                         {
                             if (!float.TryParse(val.Value.ToString(), out float a))
                             {
-                                stringBuilder.Append($"第{row}行,第{col.Column}列数据格式不是数字型;");
+                               GetDataCheckError(errorInfoItem, col.Column, "数据格式不是数字");
                             }
                             else
                             {
@@ -170,7 +178,7 @@ namespace MyAbpDemo.Infrastructure
                         {
                             if (!DateTime.TryParse(val.Value.ToString(), out DateTime a))
                             {
-                                stringBuilder.Append($"第{row}行,第{col.Column}列数据格式不是日期类型;");
+                                GetDataCheckError(errorInfoItem, col.Column, "数据格式不是日期类型");
                             }
                             else
                             {
@@ -181,7 +189,7 @@ namespace MyAbpDemo.Infrastructure
                         {
                             if (!IsSafeSqlString(val.Value.ToString()))
                             {
-                                stringBuilder.Append($"第{row}行,第{col.Column}列含有特殊字符;");
+                              GetDataCheckError(errorInfoItem, col.Column, "含有特殊字符");
                             }
                             else
                             {
@@ -190,8 +198,11 @@ namespace MyAbpDemo.Infrastructure
                         }
                     }
 
-                list.Add(tnew);
-            }
+                    //返回结果
+                    list.Add(tnew);
+                    //错误信息
+                    errorInfo.Add(errorInfoItem);
+                }
             #endregion
 
               return list;
@@ -202,9 +213,40 @@ namespace MyAbpDemo.Infrastructure
         /// </summary>
         /// <param name="str">要判断字符串</param>
         /// <returns>判断结果</returns>
-        public static bool IsSafeSqlString(string str)
+        private static bool IsSafeSqlString(string str)
         {
             return !Regex.IsMatch(str, @"[;|,|\/|\(|\)|\[|\]|\}|\{|%|@|\*|!|\']");
+        }
+
+        /// <summary>
+        /// 返回excel错误详情
+        /// </summary>
+        /// <param name="errorInfo"></param>
+        /// <param name="errorMsg"></param>
+        private static void GetExcelDetailError(List<ValidatorErrorInfo> errorInfo,string errorMsg)
+        {
+            errorInfo.Add(new ValidatorErrorInfo
+            {
+                ErrorDetails = new List<ErrorDetail>
+                {
+                    new ErrorDetail{ErrorMsg = errorMsg}
+                }
+            });
+        }
+
+        /// <summary>
+        /// 获取数据校验错误
+        /// </summary>
+        /// <param name="validatorErrorInfo"></param>
+        /// <param name="col"></param>
+        /// <param name="errorMsg"></param>
+        private static void GetDataCheckError(ValidatorErrorInfo validatorErrorInfo, int col,string errorMsg)
+        {
+            validatorErrorInfo.ErrorDetails.Add(new ErrorDetail
+            {
+                Colum = col.ToString(),
+                ErrorMsg = errorMsg
+            });
         }
     }
 

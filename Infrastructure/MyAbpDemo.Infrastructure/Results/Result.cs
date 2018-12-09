@@ -70,14 +70,6 @@ namespace MyAbpDemo.Infrastructure
         public static Result Fail(ResultCode code, string error = null) => new Result(code, error);
 
         /// <summary>
-        /// FromData
-        /// </summary>
-        /// <typeparam name="TData"></typeparam>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public static Result<TData> FromData<TData>(TData data) => new Result<TData>(ResultCode.Ok, data);
-        
-        /// <summary>
         /// Fail
         /// </summary>
         /// <typeparam name="TData"></typeparam>
@@ -85,6 +77,14 @@ namespace MyAbpDemo.Infrastructure
         /// <param name="error"></param>
         /// <returns></returns>
         public static Result<TData> Fail<TData>(ResultCode code, string error = null) => new Result<TData>(code, default(TData), error);
+
+        /// <summary>
+        /// success
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static Result<TData> FromData<TData>(TData data) => new Result<TData>(ResultCode.Ok, data);
     }
 
     /// <summary>
