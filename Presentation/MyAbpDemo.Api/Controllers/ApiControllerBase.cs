@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abp.AspNetCore.Mvc.Controllers;
+using Abp.Auditing;
 using Abp.Dependency;
 using Abp.Web.Models;
 using Castle.Core.Logging;

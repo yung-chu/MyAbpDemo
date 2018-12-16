@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using MyAbpDemo.Infrastructure.EFCore;
 
-
-namespace MyAbpDemo.Infrastructure.EFCore
+namespace MyAbpDemo.Infrastructure.EFCore.Migrations
 {
     [DbContext(typeof(MyAbpDemoDbContext))]
     partial class MyAbpDemoDbContextModelSnapshot : ModelSnapshot
@@ -18,6 +18,45 @@ namespace MyAbpDemo.Infrastructure.EFCore
                 .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("MyAbpDemo.Core.AuditInfoLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("BrowserInfo");
+
+                    b.Property<string>("ClientIpAddress");
+
+                    b.Property<string>("ClientName");
+
+                    b.Property<string>("CustomData");
+
+                    b.Property<string>("Exception");
+
+                    b.Property<int>("ExecutionDuration");
+
+                    b.Property<DateTime>("ExecutionTime");
+
+                    b.Property<int?>("ImpersonatorTenantId");
+
+                    b.Property<long?>("ImpersonatorUserId");
+
+                    b.Property<string>("MethodName");
+
+                    b.Property<string>("Parameters");
+
+                    b.Property<string>("ServiceName");
+
+                    b.Property<int?>("TenantId");
+
+                    b.Property<long?>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditInfoLog");
+                });
 
             modelBuilder.Entity("MyAbpDemo.Core.Student", b =>
                 {
@@ -58,8 +97,8 @@ namespace MyAbpDemo.Infrastructure.EFCore
                     b.ToTable("Students");
 
                     b.HasData(
-                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2018, 12, 2, 21, 52, 48, 311, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)1, Name = "学生1", TeacherId = 1L },
-                        new { Id = 2L, Age = 36, CreationTime = new DateTime(2018, 12, 2, 21, 52, 48, 312, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)4, Name = "学生2", TeacherId = 1L }
+                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2018, 12, 14, 18, 26, 56, 551, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)1, Name = "学生1", TeacherId = 1L },
+                        new { Id = 2L, Age = 36, CreationTime = new DateTime(2018, 12, 14, 18, 26, 56, 551, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)4, Name = "学生2", TeacherId = 1L }
                     );
                 });
 
@@ -98,7 +137,7 @@ namespace MyAbpDemo.Infrastructure.EFCore
                     b.ToTable("Teachers");
 
                     b.HasData(
-                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2018, 12, 2, 21, 52, 48, 309, DateTimeKind.Local), IsActive = true, IsDeleted = false, IsReview = true, Name = "朱老师" }
+                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2018, 12, 14, 18, 26, 56, 549, DateTimeKind.Local), IsActive = true, IsDeleted = false, IsReview = true, Name = "朱老师" }
                     );
                 });
 

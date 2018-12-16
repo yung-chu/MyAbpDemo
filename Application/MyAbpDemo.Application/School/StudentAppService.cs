@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Abp.Auditing;
 using Abp.AutoMapper;
+using Abp.Collections.Extensions;
 using Abp.Runtime.Caching;
 using Abp.UI;
 using AutoMapper.QueryableExtensions;
@@ -26,17 +28,42 @@ namespace MyAbpDemo.Application
         private readonly ICacheManager _cacheManager;
 
        public StudentAppService(IStudentRepository studentRepository, ITeacherRepository teacherRepository,
-            IStudentDomainService studentDomainService)
+            IStudentDomainService studentDomainService, ICacheManager cacheManager)
         {
             _studentRepository = studentRepository;
             _teacherRepository = teacherRepository;
             _studentDomainService = studentDomainService;
+            _cacheManager = cacheManager;
         }
 
         public async Task<Result<List<GetStudentListOutput>>> GetStudentList()
         {
             var result = await _studentRepository.GetAll().ProjectTo<GetStudentListOutput>().ToListAsync();
             return Result.FromData(result);
+        }
+
+
+        public async Task<Result<GetStudentListOutput>> GetSingleStudent(int id)
+        {
+            var student = new GetStudentListOutput();
+            var result = Result.FromData(student);
+
+            if (_cacheManager.GetStudent(id.ToString())!=null)
+            {
+                student = _cacheManager.GetStudent(id.ToString());
+            }
+            else //数据取
+            {
+                if (_studentRepository.GetAll().Any(a => a.Id == id))
+                {
+                    student = (await _studentRepository.GetAll().FirstAsync(a => a.Id == id)).MapTo<GetStudentListOutput>();
+                }
+
+                _cacheManager.SetStudent(id.ToString(), student);
+            }
+
+            result.Data = student;
+            return result;
         }
 
         /// <summary>
@@ -61,6 +88,8 @@ namespace MyAbpDemo.Application
             return Result.Ok();
         }
 
+
+        #region 导入、导出
         /// <summary>
         ///  excel导入
         /// </summary>
@@ -84,23 +113,9 @@ namespace MyAbpDemo.Application
                 return result;
             }
 
-            var validatorErrorInfos = new List<ValidatorErrorInfo>();
-            List<ImportStudent> list = EpplusHelper.Import<ImportStudent>(uploadedFile, validatorErrorInfos);
-
-            //逻辑校验
-            if (!validatorErrorInfos.Any())
-            {
-                //校验老师编码
-                bool CheckTeacherId(int teacherId) => _teacherRepository.GetAll().Select(a => a.Id).Contains(teacherId);
-
-                //校验学生等级
-                bool CkeckLearnLevel(string learnLevel) => new LearnLevel().GetEnumInfoList().Select(a => a.DisplayName)
-                    .Contains(learnLevel);
-
-                //导入数据检验
-                validatorErrorInfos = new StudentValidator(CkeckLearnLevel, CheckTeacherId).GetObjectValidatorError(list);
-            }
-
+            //逻辑验证
+            var list = new List<ImportStudent>();
+            var validatorErrorInfos = GetValidatorErrorInfo(uploadedFile, list);
             if (validatorErrorInfos.Any())
             {
                 result.Code = ResultCode.ParameterFailed;
@@ -124,24 +139,118 @@ namespace MyAbpDemo.Application
         }
 
         /// <summary>
-        /// 测试分组导入
+        /// 返回导出错误excel(增加错误列)
         /// </summary>
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
-        public  Result GroupImport(IFormFile uploadedFile)
+        public Result<List<ExportWithError>> GetExportWithValidateError(IFormFile uploadedFile)
         {
-            return Result.Ok();
+            var getData = new List<ExportWithError>();
+            var result = Result.FromData(getData);
+
+            if (uploadedFile == null)
+            {
+                result.Message = "请选择上传excel";
+                result.Code = ResultCode.ParameterFailed;
+                return result;
+            }
+
+            if (!uploadedFile.FileName.EndsWith("xlsx"))
+            {
+                result.Message = "请选择上传后缀xlsx格式的excel";
+                result.Code = ResultCode.ParameterFailed;
+                return result;
+            }
+
+            //逻辑验证
+            var importList = new List<ImportStudent>();
+            var validatorErrorInfos = GetValidatorErrorInfo(uploadedFile, importList);
+            if (validatorErrorInfos.Count==1&& string.IsNullOrEmpty(validatorErrorInfos.First().Row))//excel模板、数据格式错误
+            {
+                result.Code = ResultCode.ParameterFailed;
+                result.Message = validatorErrorInfos.GetValidatorErrorStr();
+                return result;
+            }
+       
+            getData = importList.MapToList<ExportWithError>();
+            foreach (var item in getData)
+            {
+                string row = (getData.IndexOf(item) + 1).ToString();
+                if (validatorErrorInfos.Any(a=>a.Row== row))
+                {
+                    item.ErrorMessage = validatorErrorInfos.First(a => a.Row == row).ErrorDetails
+                        .Select(a => a.ErrorMsg).JoinAsString(",");
+                }
+            }
+         
+            result.Data = getData;
+            return result;
         }
 
         /// <summary>
-        /// 方案A
+        /// 行分组导入测试
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        public Result<Dictionary<List<ImportGroupStudent>, List<CellPosition>>> GroupImport(IFormFile uploadedFile)
+        {
+            var dictionary=new Dictionary<List<ImportGroupStudent>, List<CellPosition>>();
+            var result = Result.FromData(dictionary);
+            var validatorErrorInfos = new List<ValidatorErrorInfo>();
+            var list= EpplusHelper.Import<ImportGroupStudent>(uploadedFile, validatorErrorInfos);
+
+            if (validatorErrorInfos.Any())
+            {
+                result.Code = ResultCode.ParameterFailed;
+                result.Message = validatorErrorInfos.GetValidatorErrorStr();
+                return result;
+            }
+
+            //方法A 获取分组多个对象
+            var newResult = ListGroupByCount(list);
+            //根据对象数量返回列起始跨度
+            var getCellPositions = GetCellPositions(newResult);
+
+            dictionary.Add(list, getCellPositions);
+            result.Data = dictionary;
+            return result;
+        }
+
+        /// <summary>
+        /// 获取逻辑验证错误信息
+        /// </summary>
+        private List<ValidatorErrorInfo> GetValidatorErrorInfo(IFormFile uploadedFile, List<ImportStudent> list)
+        {
+            var validatorErrorInfos = new List<ValidatorErrorInfo>();
+            list.AddRange(EpplusHelper.Import<ImportStudent>(uploadedFile, validatorErrorInfos));
+
+            //逻辑校验
+            if (!validatorErrorInfos.Any()|| validatorErrorInfos.Select(a=>a.ErrorDetails).Count()>1)
+            {
+                //校验老师编码
+                bool CheckTeacherId(int teacherId) =>teacherId==0 || _teacherRepository.GetAll().Select(a => a.Id).Contains(teacherId);
+
+                //校验学生等级(系统已经校验不为空)
+                bool CkeckLearnLevel(string learnLevel) => string.IsNullOrEmpty(learnLevel) ||new LearnLevel().GetEnumInfoList().Select(a => a.DisplayName)
+                    .Contains(learnLevel);
+
+                //导入数据检验
+                validatorErrorInfos = new StudentValidator(CkeckLearnLevel, CheckTeacherId).GetObjectValidatorError(list);
+            }
+
+            return validatorErrorInfos;
+        }
+
+        /// <summary>
+        /// 分组导入方案A
+        /// 按组存一个对象
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        private static List<List<GroupImport>> ListGroupByCount(List<GroupImport> list)
+        private static List<List<ImportGroupStudent>> ListGroupByCount(List<ImportGroupStudent> list) 
         {
-            List<GroupImport> getImports = new List<GroupImport>();
-            var getImportList = new List<List<GroupImport>>();
+            List<ImportGroupStudent> getImports = new List<ImportGroupStudent>();
+            var getImportList = new List<List<ImportGroupStudent>>();
 
             foreach (var item in list)
             {
@@ -153,7 +262,7 @@ namespace MyAbpDemo.Application
 
                 if (currentIndex != 0)
                 {
-                    if (item.Count == 0)
+                    if (item.Count==0)
                     {
                         getImports.Add(item);
                         if (currentIndex == list.Count - 1)
@@ -164,7 +273,7 @@ namespace MyAbpDemo.Application
                     else
                     {
                         getImportList.Add(getImports);
-                        getImports = new List<GroupImport> { item };
+                        getImports = new List<ImportGroupStudent> { item };
                         if (currentIndex == list.Count - 1)
                         {
                             getImportList.Add(getImports);
@@ -177,13 +286,13 @@ namespace MyAbpDemo.Application
         }
 
         /// <summary>
-        /// 方案B
+        /// 分组导入方案B
         /// https://stackoverflow.com/questions/36978100/how-to-use-epplus-with-cells-containing-few-rows
         /// </summary>
         /// <returns></returns>
-        static List<GroupImport> ImportRecords(IFormFile uploadedFile)
+        static List<ImportGroupStudent> ImportRecords(IFormFile uploadedFile)
         {
-            var ret = new List<GroupImport>();
+            var ret = new List<ImportGroupStudent>();
             using (var excel = new ExcelPackage(uploadedFile.OpenReadStream()))
             {
                 var wks = excel.Workbook.Worksheets["Sheet1"];
@@ -191,11 +300,11 @@ namespace MyAbpDemo.Application
 
                 for (int i = 2; i <= lastRow; i++)
                 {
-                    var importedRecord = new GroupImport
+                    var importedRecord = new ImportGroupStudent
                     {
-                        Count =Convert.ToInt32(GetCellValueFromPossiblyMergedCell(wks, i, 1)) ,
+                        Count = Convert.ToInt32(GetCellValueFromPossiblyMergedCell(wks, i, 1)),
                         BarCode = wks.Cells[i, 2].Value.ToString(),
-                        Price = Convert.ToDecimal( wks.Cells[i, 3].Value.ToString())
+                        Price = Convert.ToDecimal(wks.Cells[i, 3].Value.ToString())
                     };
                     ret.Add(importedRecord);
                 }
@@ -218,5 +327,45 @@ namespace MyAbpDemo.Application
             }
         }
 
+
+        //根据对象数量返回列起始跨度
+        private List<CellPosition> GetCellPositions(List<List<ImportGroupStudent>> list)
+        {
+            var cellPositions = new List<CellPosition>();
+            var rowObjectCount = new List<int>();
+            list.ForEach(a =>
+            {
+                rowObjectCount.Add(a.Count);
+            });
+
+            int fromRow = 0, toRow = 0;
+            foreach (var item in rowObjectCount)
+            {
+                int index = rowObjectCount.IndexOf(item);
+                if (index == 0)
+                {
+                    fromRow = 2;
+                    toRow = fromRow + item - 1;
+                }
+                else
+                {
+                    fromRow = toRow + 1;
+                    toRow = fromRow + item - 1;
+                }
+
+                cellPositions.Add(new CellPosition
+                {
+                    FromRow = fromRow,
+                    FromCol = 1,
+                    ToRow = toRow,
+                    ToCol = 1
+                });
+            }
+
+            return cellPositions;
+        }
+
+
+        #endregion
     }
 }

@@ -18,6 +18,12 @@ namespace MyAbpDemo.Application
         Task<Result<List<GetStudentListOutput>>> GetStudentList();
 
         /// <summary>
+        /// getSingle
+        /// </summary>
+        /// <returns></returns>
+        Task<Result<GetStudentListOutput>> GetSingleStudent(int id);
+
+        /// <summary>
         /// createStudent
         /// </summary>
         /// <param name="input"></param>
@@ -30,6 +36,7 @@ namespace MyAbpDemo.Application
         /// <returns></returns>
         Task<List<ExportStudent>> GetExportStudentList();
 
+
         /// <summary>
         /// excel导入
         /// </summary>
@@ -37,11 +44,19 @@ namespace MyAbpDemo.Application
         /// <returns></returns>
         Task<Result> Import(IFormFile uploadedFile);
 
+
         /// <summary>
-        /// excel合并单元格分组导入
+        ///  excel分组导入返回合并单元格信息
         /// </summary>
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
-        Result GroupImport(IFormFile uploadedFile);
+        Result<Dictionary<List<ImportGroupStudent>, List<CellPosition>>> GroupImport(IFormFile uploadedFile);
+
+        /// <summary>
+        /// excel导入后返回导出错误excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        Result<List<ExportWithError>> GetExportWithValidateError(IFormFile uploadedFile);
     }
 }

@@ -46,7 +46,7 @@ namespace MyAbpDemo.Infrastructure
         public static string GetValidatorErrorStr(this List<ValidatorErrorInfo> list)
         {
             //excel模板异常直接返回
-            if (list.Count==1)
+            if (list.Count == 1 && string.IsNullOrEmpty(list.First().Row))
             {
                 return list.Select(a => a.ErrorDetails.Select(b => b.ErrorMsg).First()).First();
             }
@@ -58,10 +58,10 @@ namespace MyAbpDemo.Infrastructure
                 sb.AppendFormat("第{0}行: ", item.Row);
                 foreach (var errorDetails in item.ErrorDetails)
                 {
-                    sb.AppendFormat("第{0}列{1}", errorDetails.Column, errorDetails.ErrorMsg);
+                    sb.AppendFormat("第{0}列{1},", errorDetails.Column, errorDetails.ErrorMsg);
                 }
 
-                stringBuilder.AppendFormat("{0};",sb);
+                stringBuilder.AppendFormat("{0};", sb.ToString().TrimEnd(','));
             }
 
             return stringBuilder.ToString().TrimEnd(';');

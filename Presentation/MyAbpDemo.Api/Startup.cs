@@ -94,7 +94,7 @@ namespace MyAbpDemo.Api
              });
 
 
-            //配置Abp和依赖注入，在最后调用
+            //ABP集成到ASP.NET Core和依赖注入，在最后调用
             return services.AddAbp<ApiModule>(
                 // Configure Log4Net logging
                 //options => options.IocManager.IocContainer.AddFacility<LoggingFacility>(

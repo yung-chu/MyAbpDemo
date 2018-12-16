@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abp.AspNetCore;
+using Abp.Auditing;
+using Abp.Dependency;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
 using Abp.Runtime.Caching.Redis;
@@ -14,22 +16,22 @@ using MyAbpDemo.Infrastructure.Api;
 namespace MyAbpDemo.Api
 {
     /// <summary>
-    /// AbpAspNetCoreModule
+    /// AbpAspNetCoreModule 必须依赖的
     /// </summary>
     [DependsOn(typeof(ApplicationModule),typeof(InfrastructureApiModule),
         typeof(AbpRedisCacheModule),typeof(AbpAspNetCoreModule))]
     public class ApiModule:AbpModule
     {
+
         public override void PreInitialize()
         {
+            var configuration = IocManager.Resolve<IConfiguration>();
+
             //配置使用Redis缓存
-           // Configuration.Caching.UseRedis();
-            //如果Redis在本机,并且使用的默认端口,下面的代码可以不要
-            //Configuration.Modules.AbpRedisCacheModule().ConnectionStringKey = "KeyName";
+            Configuration.Caching.UseRedis(options => options.ConnectionString= configuration.GetConnectionString("RedisServer"));
 
 
             //设置默认链接
-            var configuration = IocManager.Resolve<IConfiguration>();
             Configuration.DefaultNameOrConnectionString =
                 configuration.GetConnectionString(MyAbpDemoConst.ConnectionStringName);
         }

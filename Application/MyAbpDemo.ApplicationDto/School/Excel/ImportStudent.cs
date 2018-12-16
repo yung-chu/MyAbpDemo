@@ -25,9 +25,9 @@ namespace MyAbpDemo.ApplicationDto
     }
 
     /// <summary>
-    /// test excel import
+    /// test excel import(数量分组.xlsx)
     /// </summary>
-    public class GroupImport
+    public class ImportGroupStudent
     {
         [DisplayName("数量")]
         public int Count { get; set; }
