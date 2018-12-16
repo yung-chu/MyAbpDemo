@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace MyAbpDemo.Infrastructure
 {
     /// <summary>
-    /// EPPLus扩展类
+    /// EPPLus相关扩展类
     /// 使用Open Office XML（Xlsx）文件格式
     /// 能读写Excel 2007/2010文件的开源组件
     /// </summary>
@@ -20,11 +23,24 @@ namespace MyAbpDemo.Infrastructure
         /// 最大行数
         /// </summary>
         public const int MaxRows = ExcelPackage.MaxRows;
+
         /// <summary>
         /// 最大列数
         /// </summary>
         public const int MaxColumns = ExcelPackage.MaxColumns;
 
+        /// <summary>
+        /// excel导出错误单元格字段
+        /// </summary>
+        public const string ExportErrorCell = "ErrorMessage";
+
+        /// <summary>
+        /// 导入时将表格转换为数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="worksheet"></param>
+        /// <param name="errorInfo"></param>
+        /// <returns></returns>
         public static List<T> ConvertSheetToObjects<T>(this ExcelWorksheet worksheet, List<ValidatorErrorInfo> errorInfo) where T : new()
         {
               #region 准备条件
@@ -35,7 +51,7 @@ namespace MyAbpDemo.Infrastructure
                 {
                     int column = properties.IndexOf(propertyInfo) + 1;
                     var displayNameAttribute = Attribute.GetCustomAttribute(propertyInfo, typeof(DisplayNameAttribute));
-                    var columnName = displayNameAttribute == null ? string.Empty : ((DisplayNameAttribute)displayNameAttribute).DisplayName.Trim();
+                    var columnName = displayNameAttribute == null ? String.Empty : ((DisplayNameAttribute)displayNameAttribute).DisplayName.Trim();
 
                     columnPropertyInfos.Add(new PropertyInfoModel
                     {
@@ -111,11 +127,11 @@ namespace MyAbpDemo.Infrastructure
 
                         if (val.Value == null)//数据为空默认空字符
                         {
-                            val.Value = string.Empty;
+                            val.Value = String.Empty;
                         }
                         if (col.Property.PropertyType == typeof(short))
                         {
-                            if (!short.TryParse(val.Value.ToString(), out short a))
+                            if (!Int16.TryParse(val.Value.ToString(), out short a))
                             {
                                 errorInfoItem.AddValidatorErrorItem(col.Column, "数据格式不是数字");
                             }
@@ -127,12 +143,12 @@ namespace MyAbpDemo.Infrastructure
                         if (col.Property.PropertyType == typeof(Int32))
                         {
                             //空字符默认值0
-                            if (string.IsNullOrEmpty(val.Value.ToString()))
+                            if (String.IsNullOrEmpty(val.Value.ToString()))
                             {
                                 val.Value = 0;
                             }
 
-                            if (!int.TryParse(val.Value.ToString(), out int a))
+                            if (!Int32.TryParse(val.Value.ToString(), out int a))
                             {
                                 errorInfoItem.AddValidatorErrorItem(col.Column, "数据格式不是数字");
                             }
@@ -143,7 +159,7 @@ namespace MyAbpDemo.Infrastructure
                         }
                         if (col.Property.PropertyType == typeof(long))
                         {
-                            if (!long.TryParse(val.Value.ToString(), out long a))
+                            if (!Int64.TryParse(val.Value.ToString(), out long a))
                             {
                               errorInfoItem.AddValidatorErrorItem(col.Column, "数据格式不是数字");
                             }
@@ -154,7 +170,7 @@ namespace MyAbpDemo.Infrastructure
                         }
                         if (col.Property.PropertyType == typeof(decimal))
                         {
-                            if (!decimal.TryParse(val.Value.ToString(), out decimal a))
+                            if (!Decimal.TryParse(val.Value.ToString(), out decimal a))
                             {
                               errorInfoItem.AddValidatorErrorItem(col.Column, "数据格式不是数字");
                             }
@@ -165,7 +181,7 @@ namespace MyAbpDemo.Infrastructure
                         }
                         if (col.Property.PropertyType == typeof(float))
                         {
-                            if (!float.TryParse(val.Value.ToString(), out float a))
+                            if (!Single.TryParse(val.Value.ToString(), out float a))
                             {
                             errorInfoItem.AddValidatorErrorItem(col.Column, "数据格式不是数字");
                             }
@@ -208,7 +224,7 @@ namespace MyAbpDemo.Infrastructure
                errorInfo.RemoveAll(a => !a.ErrorDetails.Any());
               #endregion
 
-            return list;
+              return list;
         }
 
         /// <summary>
@@ -219,6 +235,124 @@ namespace MyAbpDemo.Infrastructure
         private static bool IsSafeSqlString(string str)
         {
             return !Regex.IsMatch(str, @"[;|,|\/|\(|\)|\[|\]|\}|\{|%|@|\*|!|\']");
+        }
+
+        /// <summary>
+        /// 导出时填充数据到表格
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="excelPackage"></param>
+        /// <param name="cellPositions"></param>
+        /// <param name="sheetName"></param>
+        public static void ConvertObjectsToSheet<T>(this ExcelPackage excelPackage, IEnumerable<T> list, List<CellPosition> cellPositions, string sheetName = "sheet1")
+        {
+            //表头
+            var propertyInfos = typeof(T).GetProperties().ToList();
+            var objectColumns = propertyInfos.Select(a => a.Name);
+
+            //Create the worksheet
+            ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(sheetName);
+
+            //Load the IEnumerable<T> into the sheet, starting from cell A1. Print the column names on row 1
+            worksheet.Cells["A1"].LoadFromCollection(list, true);
+
+            //设置列格式
+            //https://q.cnblogs.com/q/65222/
+            foreach (var item in propertyInfos)
+            {
+                var col = propertyInfos.IndexOf(item) + 1;
+                switch (item.PropertyType.Name.ToLower())
+                {
+                    case "decimal":
+                        worksheet.Column(col).Style.Numberformat.Format = "#,##0.00";//保留两位小数
+                        break;
+
+                    case "datetime":
+                        worksheet.Column(col).Style.Numberformat.Format = "yyyy-mm-dd";
+                        break;
+                }
+            }
+
+            //获取一个区域，并对该区域进行样式设置
+            ExcelBorderStyle borderStyle = ExcelBorderStyle.Thin;
+            Color borderColor = Color.FromArgb(155, 155, 155);
+            //对所有区域设置 ExcelRange(ExcelWorksheet sheet, int fromRow, int fromCol, int toRow, int toCol)
+            using (ExcelRange rng = worksheet.Cells[1, 1, list.Count() + 1, objectColumns.Count()])
+            {
+                rng.Style.Font.Name = "宋体";
+                rng.Style.Font.Size = 10;
+                rng.Style.Fill.PatternType = ExcelFillStyle.Solid;    //Set Pattern for the background to Solid
+                rng.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 255, 255));
+                rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                rng.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                rng.Style.Border.Top.Style = borderStyle;
+                rng.Style.Border.Top.Color.SetColor(borderColor);
+
+                rng.Style.Border.Bottom.Style = borderStyle;
+                rng.Style.Border.Bottom.Color.SetColor(borderColor);
+
+                rng.Style.Border.Right.Style = borderStyle;
+                rng.Style.Border.Right.Color.SetColor(borderColor);
+            }
+
+            //Format the header row
+            using (ExcelRange rng = worksheet.Cells[1, 1, 1, objectColumns.Count()])
+            {
+                rng.Style.Font.Bold = true;
+                rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                rng.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(234, 241, 246));  //Set color to dark blue
+                rng.Style.Font.Color.SetColor(Color.FromArgb(51, 51, 51));
+            }
+
+            //导出时返回校验错误行标红
+            //字段必须是 ExportErrorCell=ErrorMessage
+            var getList = list.ToList();
+            bool isExistsError = objectColumns.Contains(ExportErrorCell);
+            if (isExistsError)
+            {
+                foreach (var item in list)
+                {
+                    var objectPropertyValue = GetObjectPropertyValue(item, ExportErrorCell);
+                    if (!String.IsNullOrEmpty(objectPropertyValue))
+                    {
+                        int row = getList.IndexOf(item) + 1;
+                        using (ExcelRange rng = worksheet.Cells[row + 1, 1, row + 1, objectColumns.Count()])
+                        {
+                            rng.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            rng.Style.Fill.BackgroundColor.SetColor(Color.OrangeRed);
+                        }
+                    }
+                }
+            }
+
+            //合并单元格
+            foreach (var item in cellPositions)
+            {
+                using (ExcelRange rng = worksheet.Cells[item.FromRow, item.FromCol, item.ToRow, item.ToCol])
+                {
+                    rng.Merge = true;
+                    rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;//水平居中
+                    rng.Style.VerticalAlignment = ExcelVerticalAlignment.Center; //垂直居中
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据属性名获取值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="propertyname"></param>
+        /// <returns></returns>
+        private static string GetObjectPropertyValue<T>(T t, string propertyname)
+        {
+            Type type = typeof(T);
+            PropertyInfo property = type.GetProperty(propertyname);
+            if (property == null) return String.Empty;
+            object o = property.GetValue(t, null);
+            if (o == null) return String.Empty;
+            return o.ToString();
         }
     }
 
@@ -241,5 +375,53 @@ namespace MyAbpDemo.Infrastructure
         /// 列名
         /// </summary>
         public string ColumnName { get; set; }
+    }
+
+    /// <summary>
+    /// 单元格位置
+    /// </summary>
+    public class CellPosition
+    {
+        /// <summary>
+        /// 开始行
+        /// </summary>
+        public int FromRow { get; set; }
+
+        /// <summary>
+        /// 开始列
+        /// </summary>
+        public int FromCol { get; set; }
+
+        /// <summary>
+        /// 结束行
+        /// </summary>
+        public int ToRow { get; set; }
+
+        /// <summary>
+        /// 结束列
+        /// </summary>
+        public int ToCol { get; set; }
+    }
+
+    /// <summary>
+    /// 导出参数
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class ExportSheet<T>
+    {        
+        /// <summary>
+        /// 表单名
+        /// </summary>
+        public string SheetName { get; set; }
+
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public IEnumerable<T> Data { get; set; }
+
+        /// <summary>
+        /// 单元格位置
+        /// </summary>
+        public List<CellPosition> CellPositions { get; set; }
     }
 }

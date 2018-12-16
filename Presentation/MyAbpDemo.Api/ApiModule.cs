@@ -28,7 +28,7 @@ namespace MyAbpDemo.Api
             var configuration = IocManager.Resolve<IConfiguration>();
 
             //配置使用Redis缓存
-            Configuration.Caching.UseRedis(options => options.ConnectionString= configuration.GetConnectionString("RedisServer"));
+            //Configuration.Caching.UseRedis(options => options.ConnectionString= configuration.GetConnectionString("RedisServer"));
 
 
             //设置默认链接

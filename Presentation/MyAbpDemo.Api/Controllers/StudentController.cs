@@ -7,6 +7,7 @@ using MyAbpDemo.Application;
 using MyAbpDemo.ApplicationDto;
 using MyAbpDemo.Infrastructure;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,12 +21,15 @@ namespace MyAbpDemo.Api.Controllers
     public class StudentController : ApiControllerBase
     {
         private readonly IStudentAppService _studentAppService;
+        private readonly ITeacherAppService _teacherAppService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public StudentController(IStudentAppService studentAppService, IHostingEnvironment hostingEnvironment)
+        public StudentController(IStudentAppService studentAppService, 
+            IHostingEnvironment hostingEnvironment, ITeacherAppService teacherAppService)
         {
              _studentAppService = studentAppService;
             _hostingEnvironment = hostingEnvironment;
+            _teacherAppService = teacherAppService;
         }
 
         /// <summary>
@@ -100,7 +104,7 @@ namespace MyAbpDemo.Api.Controllers
         {
             string path = $"TempExport\\学生-{DateTime.Now:yyyyMMddHHmmss}.xlsx";
             var list = await _studentAppService.GetExportStudentList();
-            return CommomExport(path, list, new List<CellPosition>());
+            return CommomExport(path, list,new List<CellPosition>());
         }
 
 
@@ -162,7 +166,7 @@ namespace MyAbpDemo.Api.Controllers
             var result = _studentAppService.GetExportWithValidateError(uploadedFile);
             if (result.IsSuccess)
             {
-                return CommomExport(path, result.Data, new List<CellPosition>());
+                return CommomExport(path, result.Data,new List<CellPosition>());
             }
 
             return BadRequest(result.BaseResult());
@@ -186,17 +190,52 @@ namespace MyAbpDemo.Api.Controllers
             if (result.IsSuccess)
             {
                 var dictionary = result.Data;
+
                 return CommomExport(path, dictionary.Keys.First(), dictionary.Values.First());
             }
 
             return BadRequest(result.BaseResult());
         }
 
+
         /// <summary>
-        /// 导出公共方法
+        /// 导出两个单元格
         /// </summary>
+        /// <returns></returns>
+        /// <response code="200">成功</response>
+        /// <response code="400">失败返回Result对象</response>  
+        [HttpGet("exportMultiple")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ExportMultiple() 
+        {
+            string path = $"TempExport\\学生验证错误-{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            var students = await _studentAppService.GetExportStudentList();
+            var teachers = await _teacherAppService.GetTeacherList();
+
+            var exportSheetOne = new ExportSheet<ExportStudent>
+            {
+                 CellPositions=new List<CellPosition>(),
+                 SheetName="学生",
+                 Data= students
+            };
+            var exportSheetTwo = new ExportSheet<GetTeacherListOutput>
+            {
+                CellPositions = new List<CellPosition>(),
+                SheetName = "老师",
+                Data = teachers.Data
+            };
+
+            return MultipleSheetExport(path, exportSheetOne, exportSheetTwo);
+        }
+
+        /// <summary>
+        /// 通用单个sheet导出公共方法
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="path"></param>
         /// <param name="list"></param>
+        /// <param name="cellPositions"></param>
         /// <returns></returns>
         private IActionResult CommomExport<T>(string path, IEnumerable<T> list, List<CellPosition> cellPositions) where T : new()
         {
@@ -218,8 +257,38 @@ namespace MyAbpDemo.Api.Controllers
                 return BadRequest("导出失败");
             }
         }
+
+
+        /// <summary>
+        /// 多个sheet导出公共方法
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <param name="exportSheetOne"></param>
+        /// <param name="exportSheetTwo"></param>
+        /// <returns></returns>
+        private IActionResult MultipleSheetExport<TS, T>(string path, ExportSheet<TS> exportSheetOne, ExportSheet<T> exportSheetTwo) 
+        {
+            try
+            {
+                string sWebRootFolder = _hostingEnvironment.WebRootPath;
+                FileInfo fileInfo = new FileInfo(Path.Combine(sWebRootFolder, path));
+                if (!Directory.Exists(fileInfo.DirectoryName))
+                {
+                    Directory.CreateDirectory(fileInfo.DirectoryName);
+                }
+
+                EpplusHelper.Export(exportSheetOne, exportSheetTwo,fileInfo);
+                new FileExtensionContentTypeProvider().TryGetContentType(path, out string contentType);
+                return File(path, contentType, Path.GetFileName(path));
+            }
+            catch (Exception e)
+            {
+                return BadRequest("导出失败");
+            }
+        }
+
         #endregion
-
-
     }
 }

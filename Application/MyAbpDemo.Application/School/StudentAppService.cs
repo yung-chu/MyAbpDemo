@@ -197,7 +197,7 @@ namespace MyAbpDemo.Application
             var dictionary=new Dictionary<List<ImportGroupStudent>, List<CellPosition>>();
             var result = Result.FromData(dictionary);
             var validatorErrorInfos = new List<ValidatorErrorInfo>();
-            var list= EpplusHelper.Import<ImportGroupStudent>(uploadedFile, validatorErrorInfos);
+            var list = EpplusHelper.Import<ImportGroupStudent>(uploadedFile, validatorErrorInfos);
 
             if (validatorErrorInfos.Any())
             {

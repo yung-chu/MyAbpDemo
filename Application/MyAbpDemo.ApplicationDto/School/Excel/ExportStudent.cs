@@ -66,4 +66,7 @@ namespace MyAbpDemo.ApplicationDto
         [DisplayName("错误信息")]
         public string ErrorMessage { get; set; }
     }
+
+
+
 }
