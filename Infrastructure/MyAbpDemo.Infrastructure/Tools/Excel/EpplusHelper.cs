@@ -15,6 +15,7 @@ namespace MyAbpDemo.Infrastructure
     {
         /// <summary>
         /// 使用EPPlus导出Excel(xlsx)
+        /// 两个sheet
         /// </summary>
         /// <typeparam name="TS">对象类型1</typeparam>
         /// <typeparam name="T">对象类型2</typeparam>
@@ -32,7 +33,7 @@ namespace MyAbpDemo.Infrastructure
         }
 
         /// <summary>
-        /// 单个sheet导出
+        /// 标准导出
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
@@ -49,30 +50,31 @@ namespace MyAbpDemo.Infrastructure
         }
 
         /// <summary>
-        /// 导入Excel(xlsx)
-        /// 包含多个Worksheets
+        /// Excel导入两个workSheet(xlsx)
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TS"></typeparam>
         /// <param name="uploadedFile">请求文件</param>
-        /// <param name="errorMsg">基本校验错误列表</param>
+        /// <param name="errorMsgOne">基本校验错误列表</param>
+        /// <param name="errorMsgTwo">基本校验错误列表</param>
         /// <returns></returns>
-        public static List<List<T>> ImportMultipleSheets<T>(IFormFile uploadedFile, List<ValidatorErrorInfo> errorMsg) where T : new()
+        public static Tuple<List<T>, List<TS>> Import<T, TS>(IFormFile uploadedFile, List<ValidatorErrorInfo> errorMsgOne, List<ValidatorErrorInfo> errorMsgTwo) where T : new() where TS : new()
         {
-            var list = new List<List<T>>();
-            using (ExcelPackage excelPackage = new ExcelPackage(uploadedFile.OpenReadStream()))
+            using (ExcelPackage package = new ExcelPackage(uploadedFile.OpenReadStream()))
             {
-                ExcelWorksheets workSheetList = excelPackage.Workbook.Worksheets;
-                foreach (var workSheet in workSheetList)
+                ExcelWorksheets workSheetList = package.Workbook.Worksheets;
+                if (workSheetList.Any() && workSheetList.Count >= 2)
                 {
-                    list.Add(workSheet.ConvertSheetToObjects<T>(errorMsg));
+                    var workSheetOne = workSheetList[1].ConvertSheetToObjects<T>(errorMsgOne);
+                    var workSheetTwo = workSheetList[2].ConvertSheetToObjects<TS>(errorMsgTwo);
+                    return Tuple.Create(workSheetOne, workSheetTwo);
                 }
             }
-
-            return list;
+            return new Tuple<List<T>, List<TS>>(new List<T>(), new List<TS>());
         }
 
         /// <summary>
-        /// 使用EPPlus导入Excel(xlsx)
+        /// 标准使用EPPlus导入Excel(xlsx)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="uploadedFile">请求文件</param>

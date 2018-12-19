@@ -20,6 +20,9 @@ using MyAbpDemo.Infrastructure;
 using MyAbpDemo.Infrastructure.Api;
 using MyAbpDemo.Infrastructure.Api.Filters;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace MyAbpDemo.Api
 {
@@ -38,17 +41,22 @@ namespace MyAbpDemo.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            //获取配置
+            services.Configure<JwtSetting>(Configuration.GetSection("JWT"));
+
+
             //添加筛选器
             //https://docs.microsoft.com/zh-cn/aspnet/core/mvc/controllers/filters?view=aspnetcore-2.1#action-filters
             services.AddMvc(option =>
                 {
-                    option.Filters.Add(typeof(MyActionFilter)); 
+                    option.Filters.Add(typeof(MyActionFilter));
+                    option.Filters.Add(typeof(MyAbpAuditActionFilter));
                     option.Filters.Add(typeof(MyAbpExceptionFilter));
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
 
-            // Register the Swagger generator, defining 1 or more Swagger documents
+            //注册swagger
             // https://docs.microsoft.com/zh-cn/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio
             services.AddSwaggerGen(options =>
             {
@@ -72,6 +80,19 @@ namespace MyAbpDemo.Api
                     options.IncludeXmlComments(file);
                 }
 
+                //添加jwt
+                options.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example - Authorization: Bearer {token}",
+                    Name = "Authorization",
+                    In = "header",
+                    Type = "apiKey"
+                });
+                options.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                {
+                    { "Bearer", new string[] { } }
+                });
+
             });
 
             //模型验证自定义结果输出
@@ -92,6 +113,36 @@ namespace MyAbpDemo.Api
                         .AllowAnyMethod();
                 });
              });
+
+
+            #region JwtBearer认证
+            //https://www.cnblogs.com/weipengpeng/p/9651336.html
+
+            services.AddAuthorization(options =>
+            {
+                //var authRequirement = new AuthRequirement("/api/user/login", ClaimTypes.Name, Configuration["JWT:Issuer"], Configuration["JWT:Audience"], signingCredentials);
+                //options.AddPolicy("POS", policy => policy.Requirements.Add(authRequirement));
+            }).AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(o =>
+            {
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:ServerSecret"])),
+                    ValidIssuer = Configuration["JWT:Issuer"],
+                    ValidAudience = Configuration["JWT:Audience"],
+                    ClockSkew = TimeSpan.Zero
+                };
+                o.Events = new JwtBearerEvents()
+                {
+                    OnTokenValidated = JwtBearerEventHandler.OnTokenValidated
+                };
+            });
+
+            #endregion
 
 
             //ABP集成到ASP.NET Core和依赖注入，在最后调用
@@ -126,6 +177,7 @@ namespace MyAbpDemo.Api
                 app.UseHsts();
             }
 
+            app.UseAuthentication();//添加jwt身份认证(app.UseMvc()之前调用)
             app.UseCors();//跨域
             app.UseHttpsRedirection();
             app.UseMvc();

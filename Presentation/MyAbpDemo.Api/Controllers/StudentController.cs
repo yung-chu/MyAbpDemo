@@ -170,7 +170,6 @@ namespace MyAbpDemo.Api.Controllers
             }
 
             return BadRequest(result.BaseResult());
-
         }
 
         /// <summary>
@@ -184,14 +183,14 @@ namespace MyAbpDemo.Api.Controllers
         [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
         public IActionResult ExportMerge(IFormFile uploadedFile) //这里是表单提交用httpPost
         {
-            string path = $"TempExport\\学生验证错误-{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            string fileName = "学生验证错误";
             var result = _studentAppService.GroupImport(uploadedFile);
 
             if (result.IsSuccess)
             {
                 var dictionary = result.Data;
 
-                return CommomExport(path, dictionary.Keys.First(), dictionary.Values.First());
+                return CommomExport(fileName, dictionary.Keys.First(), dictionary.Values.First());
             }
 
             return BadRequest(result.BaseResult());
@@ -209,7 +208,7 @@ namespace MyAbpDemo.Api.Controllers
         [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ExportMultiple() 
         {
-            string path = $"TempExport\\学生验证错误-{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            string fileName = "学生验证错误";
             var students = await _studentAppService.GetExportStudentList();
             var teachers = await _teacherAppService.GetTeacherList();
 
@@ -226,22 +225,25 @@ namespace MyAbpDemo.Api.Controllers
                 Data = teachers.Data
             };
 
-            return MultipleSheetExport(path, exportSheetOne, exportSheetTwo);
+            return MultipleSheetExport(fileName, exportSheetOne, exportSheetTwo);
         }
 
         /// <summary>
         /// 通用单个sheet导出公共方法
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="path"></param>
+        /// <param name="fileName"></param>
         /// <param name="list"></param>
         /// <param name="cellPositions"></param>
         /// <returns></returns>
-        private IActionResult CommomExport<T>(string path, IEnumerable<T> list, List<CellPosition> cellPositions) where T : new()
+        private IActionResult CommomExport<T>(string fileName, IEnumerable<T> list, List<CellPosition> cellPositions) where T : new()
         {
+            string sWebRootFolder = _hostingEnvironment.WebRootPath;
+            string path = $"TempExport\\{fileName}-{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+
             try
             {
-                string sWebRootFolder = _hostingEnvironment.WebRootPath;
+             
                 FileInfo fileInfo = new FileInfo(Path.Combine(sWebRootFolder, path));
                 if (!Directory.Exists(fileInfo.DirectoryName))
                 {
@@ -264,15 +266,17 @@ namespace MyAbpDemo.Api.Controllers
         /// </summary>
         /// <typeparam name="TS"></typeparam>
         /// <typeparam name="T"></typeparam>
-        /// <param name="path"></param>
+        /// <param name="fileName"></param>
         /// <param name="exportSheetOne"></param>
         /// <param name="exportSheetTwo"></param>
         /// <returns></returns>
-        private IActionResult MultipleSheetExport<TS, T>(string path, ExportSheet<TS> exportSheetOne, ExportSheet<T> exportSheetTwo) 
+        private IActionResult MultipleSheetExport<TS, T>(string fileName, ExportSheet<TS> exportSheetOne, ExportSheet<T> exportSheetTwo)
         {
+            string sWebRootFolder = _hostingEnvironment.WebRootPath;
+            string path = $"TempExport\\{fileName}-{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+
             try
             {
-                string sWebRootFolder = _hostingEnvironment.WebRootPath;
                 FileInfo fileInfo = new FileInfo(Path.Combine(sWebRootFolder, path));
                 if (!Directory.Exists(fileInfo.DirectoryName))
                 {

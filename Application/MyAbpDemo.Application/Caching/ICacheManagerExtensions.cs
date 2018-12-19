@@ -42,10 +42,35 @@ namespace MyAbpDemo.Application
         /// </summary>
         /// <param name="cacheManager"></param>
         /// <param name="studentId"></param>
-        /// <param name="student"></param>
         public static void  RemoveStudent(this ICacheManager cacheManager, string studentId)
         {
             cacheManager.GetCache<string, GetStudentListOutput>(StudentCache).Remove(studentId);
+        }
+
+
+
+        private const string UserTokenKey = "UserTokenKey";
+
+        /// <summary>
+        /// 获取用户Token
+        /// </summary>
+        /// <param name="cacheManager"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public static string GetUserTokenCache(this ICacheManager cacheManager, string userId)
+        {
+            return cacheManager.GetCache<string, string>(UserTokenKey).GetOrDefault(userId);
+        }
+
+        /// <summary>
+        /// 设置用户Token缓存2小时
+        /// </summary>
+        /// <param name="cacheManager"></param>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        public static void SetUserTokenCache(this ICacheManager cacheManager, string userId, string token)
+        {
+            cacheManager.GetCache<string, string>(UserTokenKey).Set(userId, token, TimeSpan.FromHours(2));
         }
     }
 }

@@ -6,7 +6,6 @@ using Abp.Auditing;
 
 namespace MyAbpDemo.Application
 {
-    [Audited]
     public abstract class AppServiceBase: ApplicationService
     {
 

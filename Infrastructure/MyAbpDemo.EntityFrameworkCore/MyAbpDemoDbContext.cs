@@ -14,8 +14,9 @@ namespace MyAbpDemo.Infrastructure.EFCore
         public DbSet<Student> Students { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
 
-        //https://docs.microsoft.com/zh-cn/ef/core/miscellaneous/configuring-dbcontext
+
         //集成EfCore
+        //https://docs.microsoft.com/zh-cn/ef/core/miscellaneous/configuring-dbcontext
         //https://github.com/ABPFrameWorkGroup/AbpDocument2Chinese/blob/master/Markdown/Abp/9.3ABP%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%E5%B1%82-%E9%9B%86%E6%88%90EntityFrameworkCore.md
         public MyAbpDemoDbContext(DbContextOptions<MyAbpDemoDbContext> options) : base(options)
         {

@@ -13,12 +13,11 @@ namespace MyAbpDemo.Application
     {
         public override void PreInitialize()
         {
-            Configuration.ReplaceService(typeof(IAuditingStore), () =>
-            {
-                IocManager.Register<IAuditingStore, MyAuditingStore>(DependencyLifeStyle.Transient);
-            });
+            //Configuration.ReplaceService(typeof(IAuditingStore), () =>
+            //{
+            //    IocManager.Register<IAuditingStore, MyAuditingStore>(DependencyLifeStyle.Transient);
+            //});
         }
-
 
         public override void Initialize()
         {

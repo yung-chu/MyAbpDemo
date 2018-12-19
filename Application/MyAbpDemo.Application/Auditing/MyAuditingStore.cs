@@ -9,7 +9,7 @@ using MyAbpDemo.Core;
 
 namespace MyAbpDemo.Application
 {
-    public class MyAuditingStore : IAuditingStore
+    public class MyAuditingStore : IAuditingStore,ITransientDependency
     {
         private readonly IAuditingRepository _auditingRepository;
         public MyAuditingStore(IAuditingRepository auditingRepository)

@@ -40,6 +40,30 @@ namespace MyAbpDemo.Infrastructure.EFCore
                 TeacherId = 1,
                 LearnLevel = LearnLevel.Excellent
             });
+
+            //https://github.com/aspnet/EntityFrameworkCore/issues/12004
+            modelBuilder.Entity<User>(b =>
+            {
+                b.HasData(new
+                {
+                    Id = (long?)1,
+                    UserName = "test1",
+                    Nickname = "小名test1",
+                    Emial = "jianlive@sina.com",
+                    Password = "123",
+                    CreationTime=DateTime.Now,
+                    IsActive=true,
+                    IsDeleted=false
+                });
+
+                b.OwnsOne(e => e.Address).HasData(new
+                {
+                    UserId=1L,
+                    CityId = 123,
+                    Number = 235,
+                    Street = "天顶街道"
+                });
+            });
         }
     }
 }
