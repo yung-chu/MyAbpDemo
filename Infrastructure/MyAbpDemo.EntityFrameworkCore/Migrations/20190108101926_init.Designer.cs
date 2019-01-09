@@ -10,8 +10,8 @@ using MyAbpDemo.Infrastructure.EFCore;
 namespace MyAbpDemo.Infrastructure.EFCore.Migrations
 {
     [DbContext(typeof(MyAbpDemoDbContext))]
-    [Migration("20181219013712_table-user")]
-    partial class tableuser
+    [Migration("20190108101926_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -60,6 +60,47 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
                     b.ToTable("AuditInfoLog");
                 });
 
+            modelBuilder.Entity("MyAbpDemo.Core.Blog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Url")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Blog");
+
+                    b.HasData(
+                        new { Id = 1, Url = "www.baidu.com" }
+                    );
+                });
+
+            modelBuilder.Entity("MyAbpDemo.Core.Post", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("BlogUrl");
+
+                    b.Property<string>("Content");
+
+                    b.Property<string>("Title");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlogUrl");
+
+                    b.ToTable("Post");
+
+                    b.HasData(
+                        new { Id = 1, BlogUrl = "www.baidu.com", Content = "6.15准时下班", Title = "下班了" }
+                    );
+                });
+
             modelBuilder.Entity("MyAbpDemo.Core.Student", b =>
                 {
                     b.Property<long>("Id")
@@ -99,8 +140,8 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
                     b.ToTable("Students");
 
                     b.HasData(
-                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2018, 12, 19, 9, 37, 12, 154, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)1, Name = "学生1", TeacherId = 1L },
-                        new { Id = 2L, Age = 36, CreationTime = new DateTime(2018, 12, 19, 9, 37, 12, 154, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)4, Name = "学生2", TeacherId = 1L }
+                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2019, 1, 8, 18, 19, 25, 866, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)1, Name = "学生1", TeacherId = 1L },
+                        new { Id = 2L, Age = 36, CreationTime = new DateTime(2019, 1, 8, 18, 19, 25, 867, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)4, Name = "学生2", TeacherId = 1L }
                     );
                 });
 
@@ -139,7 +180,7 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
                     b.ToTable("Teachers");
 
                     b.HasData(
-                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2018, 12, 19, 9, 37, 12, 151, DateTimeKind.Local), IsActive = true, IsDeleted = false, IsReview = true, Name = "朱老师" }
+                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2019, 1, 8, 18, 19, 25, 865, DateTimeKind.Local), IsActive = true, IsDeleted = false, IsReview = true, Name = "朱老师" }
                     );
                 });
 
@@ -178,8 +219,17 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
                     b.ToTable("User");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = new DateTime(2018, 12, 19, 9, 37, 12, 155, DateTimeKind.Local), Emial = "jianlive@sina.com", IsActive = true, IsDeleted = false, Nickname = "小名test1", Password = "123", UserName = "test1" }
+                        new { Id = 1L, CreationTime = new DateTime(2019, 1, 8, 18, 19, 25, 868, DateTimeKind.Local), Emial = "jianlive@sina.com", IsActive = true, IsDeleted = false, Nickname = "小名test1", Password = "123", UserName = "test1" }
                     );
+                });
+
+            modelBuilder.Entity("MyAbpDemo.Core.Post", b =>
+                {
+                    b.HasOne("MyAbpDemo.Core.Blog", "Blog")
+                        .WithMany("Posts")
+                        .HasForeignKey("BlogUrl")
+                        .HasPrincipalKey("Url")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("MyAbpDemo.Core.Student", b =>

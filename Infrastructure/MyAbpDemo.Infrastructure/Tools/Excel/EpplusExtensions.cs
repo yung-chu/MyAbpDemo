@@ -170,6 +170,12 @@ namespace MyAbpDemo.Infrastructure
                         }
                         if (col.Property.PropertyType == typeof(decimal))
                         {
+                            //空字符默认值0
+                            if (string.IsNullOrEmpty(val.Value.ToString()))
+                            {
+                                val.Value = 0;
+                            }
+
                             if (!Decimal.TryParse(val.Value.ToString(), out decimal a))
                             {
                               errorInfoItem.AddValidatorErrorItem(col.Column, "数据格式不是数字");

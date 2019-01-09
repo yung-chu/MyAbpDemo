@@ -10,6 +10,7 @@ namespace MyAbpDemo.Infrastructure.EFCore
     {
         public static void Seed(this ModelBuilder modelBuilder)
         {
+            #region school
             //teacher 
             modelBuilder.Entity<Teacher>().HasData(new Teacher()
             {
@@ -28,7 +29,7 @@ namespace MyAbpDemo.Infrastructure.EFCore
                 Age = 18,
                 IsActive = true,
                 TeacherId = 1,
-                LearnLevel= LearnLevel.BelowStandard
+                LearnLevel = LearnLevel.BelowStandard
             });
 
             modelBuilder.Entity<Student>().HasData(new Student()
@@ -41,6 +42,10 @@ namespace MyAbpDemo.Infrastructure.EFCore
                 LearnLevel = LearnLevel.Excellent
             });
 
+            #endregion
+
+
+            //user
             //https://github.com/aspnet/EntityFrameworkCore/issues/12004
             modelBuilder.Entity<User>(b =>
             {
@@ -64,6 +69,45 @@ namespace MyAbpDemo.Infrastructure.EFCore
                     Street = "天顶街道"
                 });
             });
+
+
+
+            #region article
+            modelBuilder.Entity<Blog>().HasData(new Blog
+            {
+                Id = 1,
+                Url = "www.baidu.com"
+            });
+
+
+            var post = new List<Post>
+            {
+                new Post
+                {
+                    Id = 1,
+                    Title = "下班了",
+                    Content = "6.15准时下班",
+                    BlogUrl = "www.baidu.com",
+                },
+                new Post
+                {
+                    Id = 1,
+                    Title = "放假了",
+                    Content = "2.2放假了",
+                    BlogUrl = "www.baidu.com",
+                }
+            };
+
+            modelBuilder.Entity<Post>().HasData(new Post
+            {
+                Id = 1,
+                Title = "下班了",
+                Content = "6.15准时下班",
+                BlogUrl = "www.baidu.com",
+            });
+
+            #endregion
+
         }
     }
 }

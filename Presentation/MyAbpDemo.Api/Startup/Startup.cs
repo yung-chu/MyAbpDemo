@@ -23,6 +23,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using MyAbpDemo.Api.Swagger;
 
 namespace MyAbpDemo.Api
 {
@@ -58,43 +59,8 @@ namespace MyAbpDemo.Api
 
             //注册swagger
             // https://docs.microsoft.com/zh-cn/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio
-            services.AddSwaggerGen(options =>
-            {
-                options.SwaggerDoc("v1", new Info
-                {
-                    Version = "v1",
-                    Title = "ToDo API",
-                    Description = "A simple example ASP.NET Core Web API",
-                    TermsOfService = "None",
-                    Contact = new Contact
-                    {
-                        Name = "zhuyong",
-                        Email = string.Empty,
-                        Url = "www.baidu.com"
-                    }
-               });
-
-                //显示注释
-                foreach (var file in Directory.GetFiles(AppContext.BaseDirectory, "MyAbpDemo.*.xml"))
-                {
-                    options.IncludeXmlComments(file);
-                }
-
-                //添加jwt
-                options.AddSecurityDefinition("Bearer", new ApiKeyScheme
-                {
-                    Description = "JWT Authorization header using the Bearer scheme. Example - Authorization: Bearer {token}",
-                    Name = "Authorization",
-                    In = "header",
-                    Type = "apiKey"
-                });
-                options.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
-                {
-                    { "Bearer", new string[] { } }
-                });
-
-            });
-
+            RegisterSwaggerGen.AddSwaggerGen(services);
+            
             //模型验证自定义结果输出
             //https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-2.1
             //https://www.strathweb.com/2018/02/exploring-the-apicontrollerattribute-and-its-features-for-asp-net-core-mvc-2-1/

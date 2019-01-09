@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Swagger\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Abp.Castle.NLog" Version="3.8.1" />
     <PackageReference Include="Abp.RedisCache" Version="4.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
@@ -31,6 +27,10 @@
     <Content Update="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\TempExport\" />
   </ItemGroup>
 
 </Project>
