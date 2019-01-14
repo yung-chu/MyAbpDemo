@@ -88,7 +88,8 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
                     Nickname = table.Column<string>(nullable: true),
                     Password = table.Column<string>(nullable: true),
                     Emial = table.Column<string>(nullable: true),
-                    IsActive = table.Column<bool>(nullable: false)
+                    IsActive = table.Column<bool>(nullable: false),
+                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -174,12 +175,12 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
             migrationBuilder.InsertData(
                 table: "Teachers",
                 columns: new[] { "Id", "Age", "CreationTime", "CreatorUserId", "DeleterUserId", "DeletionTime", "IsActive", "IsDeleted", "IsReview", "LastModificationTime", "LastModifierUserId", "Name" },
-                values: new object[] { 1L, 18, new DateTime(2019, 1, 8, 18, 19, 25, 865, DateTimeKind.Local), null, null, null, true, false, true, null, null, "朱老师" });
+                values: new object[] { 1L, 18, new DateTime(2019, 1, 14, 10, 7, 26, 312, DateTimeKind.Local), null, null, null, true, false, true, null, null, "朱老师" });
 
             migrationBuilder.InsertData(
                 table: "User",
-                columns: new[] { "Id", "CreationTime", "CreatorUserId", "DeleterUserId", "DeletionTime", "Emial", "IsActive", "IsDeleted", "LastModificationTime", "LastModifierUserId", "Nickname", "Password", "UserName" },
-                values: new object[] { 1L, new DateTime(2019, 1, 8, 18, 19, 25, 868, DateTimeKind.Local), null, null, null, "jianlive@sina.com", true, false, null, null, "小名test1", "123", "test1" });
+                columns: new[] { "Id", "CreationTime", "CreatorUserId", "DeleterUserId", "DeletionTime", "Emial", "IsActive", "IsDeleted", "LastModificationTime", "LastModifierUserId", "Nickname", "Password", "RowVersion", "UserName" },
+                values: new object[] { 1L, new DateTime(2019, 1, 14, 10, 7, 26, 315, DateTimeKind.Local), null, null, null, "jianlive@sina.com", true, false, null, null, "小名test1", "123", null, "test1" });
 
             migrationBuilder.InsertData(
                 table: "Adress",
@@ -189,15 +190,19 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
             migrationBuilder.InsertData(
                 table: "Post",
                 columns: new[] { "Id", "BlogUrl", "Content", "Title" },
-                values: new object[] { 1, "www.baidu.com", "6.15准时下班", "下班了" });
+                values: new object[,]
+                {
+                    { 1, "www.baidu.com", "6.15准时下班", "下班了" },
+                    { 2, "www.baidu.com", "2.5过年了", "过年了" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Students",
                 columns: new[] { "Id", "Age", "CreationTime", "CreatorUserId", "DeleterUserId", "DeletionTime", "IsActive", "IsDeleted", "LastModificationTime", "LastModifierUserId", "LearnLevel", "Name", "TeacherId" },
                 values: new object[,]
                 {
-                    { 1L, 18, new DateTime(2019, 1, 8, 18, 19, 25, 866, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)1, "学生1", 1L },
-                    { 2L, 36, new DateTime(2019, 1, 8, 18, 19, 25, 867, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)4, "学生2", 1L }
+                    { 1L, 18, new DateTime(2019, 1, 14, 10, 7, 26, 314, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)1, "学生1", 1L },
+                    { 2L, 36, new DateTime(2019, 1, 14, 10, 7, 26, 314, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)4, "学生2", 1L }
                 });
 
             migrationBuilder.CreateIndex(

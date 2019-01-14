@@ -209,9 +209,10 @@ namespace MyAbpDemo.Infrastructure
                         }
                         if (col.Property.PropertyType == typeof(String))
                         {
-                            if (!IsSafeSqlString(val.Value.ToString()))
+                            string pattern = @"*|and|exec|insert|select|delete|update|count|master|truncate|declare|char(|mid(|chr(|'";
+                            if (Regex.Match(val.Value.ToString(), Regex.Escape(pattern),RegexOptions.Compiled | RegexOptions.IgnoreCase).Success)
                             {
-                                errorInfoItem.AddValidatorErrorItem(col.Column, "含有特殊字符");
+                                errorInfoItem.AddValidatorErrorItem(col.Column, "含有非法字符");
                             }
                             else
                             {
@@ -231,16 +232,6 @@ namespace MyAbpDemo.Infrastructure
               #endregion
 
               return list;
-        }
-
-        /// <summary>
-        /// 检测是否有Sql危险字符
-        /// </summary>
-        /// <param name="str">要判断字符串</param>
-        /// <returns>判断结果</returns>
-        private static bool IsSafeSqlString(string str)
-        {
-            return !Regex.IsMatch(str, @"[;|,|\/|\(|\)|\[|\]|\}|\{|%|@|\*|!|\']");
         }
 
         /// <summary>

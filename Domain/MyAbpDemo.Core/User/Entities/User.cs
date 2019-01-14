@@ -41,6 +41,11 @@ namespace MyAbpDemo.Core
         /// 是否启用
         /// </summary>
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// 行版本
+        /// </summary>
+        public byte[] RowVersion { get; set; }
     }
 
     /// <summary>

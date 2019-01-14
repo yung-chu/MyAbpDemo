@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Abp.Domain.Uow;
 using Abp.Runtime.Caching;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +21,7 @@ namespace MyAbpDemo.Api.Controllers
         private IUserAppService _userAppService;
         private readonly JwtSetting _jwtSetting;
         private readonly ICacheManager _cacheManager;
-
+     
         public AccountController(IUserAppService userAppService, IOptions<JwtSetting> jwtSetting, ICacheManager cacheManager)
         {
             _userAppService = userAppService;
@@ -40,11 +41,34 @@ namespace MyAbpDemo.Api.Controllers
 
         public async Task<IActionResult> Users()
         {
-            var result =await _userAppService.GetUserList();
+            var result =await _userAppService.GetUserListAsync();
             if (result.IsSuccess)
             {
                 return Ok(result);
             }
+            return BadRequest(result.BaseResult());
+        }
+
+
+        /// <summary>
+        /// 修改用户
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPatch("user")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
+
+        public async Task<IActionResult> UpdateUser([FromBody]UpdateUserInput input)
+        {
+         
+            var result = await _userAppService.UpdateUserAsync(input);
+            if (result.IsSuccess)
+            {
+                return Ok();
+            }
+
             return BadRequest(result.BaseResult());
         }
 
@@ -60,7 +84,7 @@ namespace MyAbpDemo.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody]LoginInput input)
         {
-            var result = await _userAppService.GetUser(input);
+            var result = await _userAppService.GetUserAsync(input);
             if (result.IsSuccess)
             {
                 //生成用户token

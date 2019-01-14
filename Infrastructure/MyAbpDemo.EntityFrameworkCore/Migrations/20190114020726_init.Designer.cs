@@ -10,7 +10,7 @@ using MyAbpDemo.Infrastructure.EFCore;
 namespace MyAbpDemo.Infrastructure.EFCore.Migrations
 {
     [DbContext(typeof(MyAbpDemoDbContext))]
-    [Migration("20190108101926_init")]
+    [Migration("20190114020726_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,7 +97,8 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
                     b.ToTable("Post");
 
                     b.HasData(
-                        new { Id = 1, BlogUrl = "www.baidu.com", Content = "6.15准时下班", Title = "下班了" }
+                        new { Id = 1, BlogUrl = "www.baidu.com", Content = "6.15准时下班", Title = "下班了" },
+                        new { Id = 2, BlogUrl = "www.baidu.com", Content = "2.5过年了", Title = "过年了" }
                     );
                 });
 
@@ -140,8 +141,8 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
                     b.ToTable("Students");
 
                     b.HasData(
-                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2019, 1, 8, 18, 19, 25, 866, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)1, Name = "学生1", TeacherId = 1L },
-                        new { Id = 2L, Age = 36, CreationTime = new DateTime(2019, 1, 8, 18, 19, 25, 867, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)4, Name = "学生2", TeacherId = 1L }
+                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2019, 1, 14, 10, 7, 26, 314, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)1, Name = "学生1", TeacherId = 1L },
+                        new { Id = 2L, Age = 36, CreationTime = new DateTime(2019, 1, 14, 10, 7, 26, 314, DateTimeKind.Local), IsActive = true, IsDeleted = false, LearnLevel = (byte)4, Name = "学生2", TeacherId = 1L }
                     );
                 });
 
@@ -180,7 +181,7 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
                     b.ToTable("Teachers");
 
                     b.HasData(
-                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2019, 1, 8, 18, 19, 25, 865, DateTimeKind.Local), IsActive = true, IsDeleted = false, IsReview = true, Name = "朱老师" }
+                        new { Id = 1L, Age = 18, CreationTime = new DateTime(2019, 1, 14, 10, 7, 26, 312, DateTimeKind.Local), IsActive = true, IsDeleted = false, IsReview = true, Name = "朱老师" }
                     );
                 });
 
@@ -212,6 +213,10 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
 
                     b.Property<string>("Password");
 
+                    b.Property<byte[]>("Timestamp")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
                     b.Property<string>("UserName");
 
                     b.HasKey("Id");
@@ -219,7 +224,7 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
                     b.ToTable("User");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = new DateTime(2019, 1, 8, 18, 19, 25, 868, DateTimeKind.Local), Emial = "jianlive@sina.com", IsActive = true, IsDeleted = false, Nickname = "小名test1", Password = "123", UserName = "test1" }
+                        new { Id = 1L, CreationTime = new DateTime(2019, 1, 14, 10, 7, 26, 315, DateTimeKind.Local), Emial = "jianlive@sina.com", IsActive = true, IsDeleted = false, Nickname = "小名test1", Password = "123", UserName = "test1" }
                     );
                 });
 

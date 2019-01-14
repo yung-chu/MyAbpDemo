@@ -19,7 +19,7 @@ namespace MyAbpDemo.Application.School
             _teacherRepository = teacherRepository;
         }
 
-        public async Task<Result<List<GetTeacherListOutput>>> GetTeacherList()
+        public async Task<Result<List<GetTeacherListOutput>>> GetTeacherListAsync()
         {
             var result= await _teacherRepository.GetAll().ProjectTo<GetTeacherListOutput>().ToListAsync();
             return Result.FromData(result);

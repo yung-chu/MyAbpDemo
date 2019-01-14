@@ -10,6 +10,6 @@ namespace MyAbpDemo.Application
 {
     public interface ITeacherAppService: IApplicationService
     {
-        Task<Result<List<GetTeacherListOutput>>> GetTeacherList();
+        Task<Result<List<GetTeacherListOutput>>> GetTeacherListAsync();
     }
 }

@@ -15,26 +15,26 @@ namespace MyAbpDemo.Application
         /// getList
         /// </summary>
         /// <returns></returns>
-        Task<Result<List<GetStudentListOutput>>> GetStudentList();
+        Task<Result<List<GetStudentListOutput>>> GetStudentListAsync();
 
         /// <summary>
         /// getSingle
         /// </summary>
         /// <returns></returns>
-        Task<Result<GetStudentListOutput>> GetSingleStudent(int id);
+        Task<Result<GetStudentListOutput>> GetSingleStudentAsync(int id);
 
         /// <summary>
         /// createStudent
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        Task<Result> CreateStudent(CreateStudentInput input);
+        Task<Result> CreateStudentAsync(CreateStudentInput input);
 
         /// <summary>
         /// excel导出
         /// </summary>
         /// <returns></returns>
-        Task<List<ExportStudent>> GetExportStudentList();
+        Task<List<ExportStudent>> GetExportStudentListAsync();
 
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace MyAbpDemo.Application
         /// </summary>
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
-        Task<Result> Import(IFormFile uploadedFile);
+        Task<Result> ImportAsync(IFormFile uploadedFile);
 
 
         /// <summary>

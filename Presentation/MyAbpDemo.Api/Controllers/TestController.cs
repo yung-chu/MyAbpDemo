@@ -28,7 +28,7 @@ namespace MyAbpDemo.Api.Controllers
         [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetPosts(int id)
         {
-            var result = await _postAppService.GetPosts(id);
+            var result = await _postAppService.GetPostsAsync(id);
             if (result.IsSuccess)
             {
                 return Ok(result);

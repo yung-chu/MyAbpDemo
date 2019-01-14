@@ -36,14 +36,14 @@ namespace MyAbpDemo.Application
             _cacheManager = cacheManager;
         }
 
-        public async Task<Result<List<GetStudentListOutput>>> GetStudentList()
+        public async Task<Result<List<GetStudentListOutput>>> GetStudentListAsync()
         {
             var result = await _studentRepository.GetAll().ProjectTo<GetStudentListOutput>().ToListAsync();
             return Result.FromData(result);
         }
 
 
-        public async Task<Result<GetStudentListOutput>> GetSingleStudent(int id)
+        public async Task<Result<GetStudentListOutput>> GetSingleStudentAsync(int id)
         {
             var student = new GetStudentListOutput();
             var result = Result.FromData(student);
@@ -70,9 +70,9 @@ namespace MyAbpDemo.Application
         /// 
         /// </summary>
         /// <returns></returns>
-        public async Task<List<ExportStudent>> GetExportStudentList()
+        public async Task<List<ExportStudent>> GetExportStudentListAsync()
         {
-            var result = (await GetStudentList());
+            var result = (await GetStudentListAsync());
             return result.MapToList<ExportStudent>();
         }
 
@@ -81,7 +81,7 @@ namespace MyAbpDemo.Application
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<Result> CreateStudent(CreateStudentInput input)
+        public async Task<Result> CreateStudentAsync(CreateStudentInput input)
         {
             var student = input.MapTo<Student>();
             await _studentDomainService.CreateStudent(student);
@@ -95,7 +95,7 @@ namespace MyAbpDemo.Application
         /// </summary>
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
-        public async Task<Result> Import(IFormFile uploadedFile)
+        public async Task<Result> ImportAsync(IFormFile uploadedFile)
         {
             var result = new Result(ResultCode.Ok);
 

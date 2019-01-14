@@ -38,13 +38,13 @@ namespace MyAbpDemo.Api.Controllers
         /// <returns></returns>
         /// <response code="200">成功</response>
         /// <response code="400">失败返回Result对象</response>  
-        [HttpGet("student")]
+        [HttpGet("students")]
         [ProducesResponseType(typeof(List<GetStudentListOutput>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
 
         public async Task<IActionResult> Index()
         {
-            var result = await _studentAppService.GetStudentList();
+            var result = await _studentAppService.GetStudentListAsync();
             if (result.IsSuccess)
             {
                 return Ok(result);
@@ -63,7 +63,7 @@ namespace MyAbpDemo.Api.Controllers
         [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody]CreateStudentInput input)
         {
-            var result = await _studentAppService.CreateStudent(input);
+            var result = await _studentAppService.CreateStudentAsync(input);
             if (result.IsSuccess)
             {
                 return Ok(result);
@@ -82,7 +82,7 @@ namespace MyAbpDemo.Api.Controllers
         [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetStudentById(int id)
         {
-             var result = await _studentAppService.GetSingleStudent(id);
+             var result = await _studentAppService.GetSingleStudentAsync(id);
             if (result.IsSuccess)
             {
                 return Ok(result);
@@ -103,7 +103,7 @@ namespace MyAbpDemo.Api.Controllers
         public async Task<IActionResult> Export()
         {
             string path = $"TempExport\\学生-{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            var list = await _studentAppService.GetExportStudentList();
+            var list = await _studentAppService.GetExportStudentListAsync();
             return CommomExport(path, list,new List<CellPosition>());
         }
 
@@ -120,7 +120,7 @@ namespace MyAbpDemo.Api.Controllers
         [ProducesResponseType(typeof(List<ValidatorErrorInfo>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Import(IFormFile uploadedFile)
         {
-            var result = await _studentAppService.Import(uploadedFile);
+            var result = await _studentAppService.ImportAsync(uploadedFile);
             if (result.IsSuccess)
             {
                 return Ok();
@@ -209,8 +209,8 @@ namespace MyAbpDemo.Api.Controllers
         public async Task<IActionResult> ExportMultiple() 
         {
             string fileName = "学生验证错误";
-            var students = await _studentAppService.GetExportStudentList();
-            var teachers = await _teacherAppService.GetTeacherList();
+            var students = await _studentAppService.GetExportStudentListAsync();
+            var teachers = await _teacherAppService.GetTeacherListAsync();
 
             var exportSheetOne = new ExportSheet<ExportStudent>
             {

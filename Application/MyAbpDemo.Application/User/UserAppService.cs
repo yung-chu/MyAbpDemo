@@ -23,7 +23,7 @@ namespace MyAbpDemo.Application
         /// GetUserList
         /// </summary>
         /// <returns></returns>
-        public async Task<Result<GetUserListOutput>> GetUserList()
+        public async Task<Result<GetUserListOutput>> GetUserListAsync()
         {
             var model = new GetUserListOutput
             {
@@ -38,16 +38,29 @@ namespace MyAbpDemo.Application
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<Result<LoginOutPut>> GetUser(LoginInput input)
+        public async Task<Result<LoginOutPut>> GetUserAsync(LoginInput input)
         {
             var result = Result.FromData(new LoginOutPut());
-            var countAsync =await _userRepository.GetAll().CountAsync(a=>a.UserName== input.UserName&&a.Password==input.Password);
-            if (countAsync == 0)
+            var isExist =await _userRepository.GetAll().AnyAsync(a=>a.UserName== input.UserName&&a.Password==input.Password);
+            if (!isExist)
             {
                 result.Code = ResultCode.ParameterFailed;
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 修改用户
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public async Task<Result> UpdateUserAsync(UpdateUserInput input)
+        {
+            var user = await _userRepository.GetAll().FirstAsync(a => a.Id == input.Id);
+            user.UserName = input.UserName;
+            await _userRepository.UpdateAsync(user);
+            return  Result.Ok();
         }
     }
 }

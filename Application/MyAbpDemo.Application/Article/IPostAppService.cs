@@ -10,6 +10,6 @@ namespace MyAbpDemo.Application
 {
     public interface IPostAppService:IApplicationService
     {
-        Task<Result<GetPostsOutput>> GetPosts(int id);
+        Task<Result<GetPostsOutput>> GetPostsAsync(int id);
     }
 }

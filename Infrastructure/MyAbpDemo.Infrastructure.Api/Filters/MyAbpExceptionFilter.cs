@@ -12,9 +12,12 @@ using Abp.AspNetCore.Mvc.Extensions;
 using Abp.AspNetCore.Mvc.Results;
 using Abp.Authorization;
 using Abp.Domain.Entities;
+using Abp.Domain.Uow;
 using Abp.Events.Bus.Exceptions;
 using Abp.Runtime.Validation;
+using Abp.UI;
 using Abp.Web.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -40,25 +43,12 @@ namespace MyAbpDemo.Infrastructure.Api.Filters
                 return;
             }
 
-            // 设置 HTTP 上下文响应所返回的错误代码，由具体异常决定。
-            int code = GetStatusCode(context,true);//wrapResultAttribute.WrapOnError
-            context.HttpContext.Response.StatusCode = code;
-
-
             //错误信息
             var errorInfo = _errorInfoBuilder.BuildForException(context.Exception);
-            string errorMessage = errorInfo.Message;
-            if (code== (int)HttpStatusCode.BadRequest)
-            {
-                errorMessage = errorInfo.ValidationErrors != null && errorInfo.ValidationErrors.Any() ?
-                    errorMessage + " " + errorInfo.ValidationErrors.Select(a => a.Message).First() : errorMessage;
-            }
-
-
+            // 设置 HTTP 上下文响应所返回的错误代码，由具体异常决定。
+            context.HttpContext.Response.StatusCode = CreateResult(context, errorInfo).Code;
             //自定义返回错误
-            context.Result = new ObjectResult(
-                new Result(code== (int)HttpStatusCode.BadRequest?ResultCode.ParameterFailed: ResultCode.Fail, errorMessage)
-            );
+            context.Result = CreateResult(context, errorInfo).actionResult;
 
             // 触发异常处理事件
             EventBus.Trigger(this, new AbpHandledExceptionData(context.Exception));
@@ -67,27 +57,70 @@ namespace MyAbpDemo.Infrastructure.Api.Filters
             context.Exception = null; //Handled!
         }
 
-        protected override int GetStatusCode(ExceptionContext context, bool wrapOnError)
+
+
+        private (int Code, IActionResult actionResult) CreateResult(ExceptionContext context,ErrorInfo errorInfo)
         {
+            var httpCode = StatusCodes.Status500InternalServerError;
+            var resultCode = ResultCode.Fail;
+            var message = errorInfo.Message;
+
             if (context.Exception is AbpAuthorizationException)
             {
-                return context.HttpContext.User.Identity.IsAuthenticated
-                    ? (int)HttpStatusCode.Forbidden
-                    : (int)HttpStatusCode.Unauthorized;
+                httpCode = context.HttpContext.User.Identity.IsAuthenticated
+                    ? StatusCodes.Status403Forbidden
+                    : StatusCodes.Status401Unauthorized;
             }
-
-            if (context.Exception is AbpValidationException)
+            else if (context.Exception is AbpValidationException)
             {
-                return (int)HttpStatusCode.BadRequest;
-            }
+                httpCode = StatusCodes.Status400BadRequest;
+                resultCode = ResultCode.ParameterFailed;
 
-            if (context.Exception is EntityNotFoundException)
+                message = $"{message} {errorInfo.Details}";
+            }
+            else if (context.Exception is UserFriendlyException)
             {
-                return (int)HttpStatusCode.NotFound;
+                httpCode = StatusCodes.Status400BadRequest;
+            }
+            else if (context.Exception is EntityNotFoundException)
+            {
+                httpCode = StatusCodes.Status404NotFound;
+            }
+            else if (context.Exception is AbpDbConcurrencyException)
+            {
+                httpCode = StatusCodes.Status400BadRequest;
+                resultCode = ResultCode.ConcurrencyRecord;
+
+                message = "数据冲突，请重新提交";
             }
 
-            return (int)HttpStatusCode.InternalServerError;
+            return (httpCode, new ObjectResult(Result.Fail(resultCode, message)));
         }
+
+
+
+
+        //protected override int GetStatusCode(ExceptionContext context, bool wrapOnError)
+        //{
+        //    if (context.Exception is AbpAuthorizationException)
+        //    {
+        //        return context.HttpContext.User.Identity.IsAuthenticated
+        //            ? (int)HttpStatusCode.Forbidden
+        //            : (int)HttpStatusCode.Unauthorized;
+        //    }
+
+        //    if (context.Exception is AbpValidationException)
+        //    {
+        //        return (int)HttpStatusCode.BadRequest;
+        //    }
+
+        //    if (context.Exception is EntityNotFoundException)
+        //    {
+        //        return (int)HttpStatusCode.NotFound;
+        //    }
+
+        //    return (int)HttpStatusCode.InternalServerError;
+        //}
     }
 
     // <summary>

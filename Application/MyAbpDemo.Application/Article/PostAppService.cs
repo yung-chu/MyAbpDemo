@@ -24,7 +24,7 @@ namespace MyAbpDemo.Application
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<Result<GetPostsOutput>> GetPosts(int id)
+        public async Task<Result<GetPostsOutput>> GetPostsAsync(int id)
         {
             var result = Result.FromData(new GetPostsOutput());
 

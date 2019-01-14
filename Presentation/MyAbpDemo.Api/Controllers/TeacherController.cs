@@ -36,7 +36,7 @@ namespace MyAbpDemo.Api.Controllers
         public async Task<IActionResult> GetTeacher()
         {
             //Logger.Info("记录日志: "+DateTime.Now );
-            var result =await  _teacherAppService.GetTeacherList();
+            var result =await  _teacherAppService.GetTeacherListAsync();
             if (result.IsSuccess)
             {
                 return Ok(result.Data);

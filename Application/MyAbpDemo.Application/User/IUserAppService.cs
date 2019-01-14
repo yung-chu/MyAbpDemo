@@ -10,8 +10,10 @@ namespace MyAbpDemo.Application
 {
     public interface IUserAppService : IApplicationService
     {
-        Task<Result<GetUserListOutput>> GetUserList();
+        Task<Result<GetUserListOutput>> GetUserListAsync();
 
-        Task<Result<LoginOutPut>> GetUser(LoginInput input);
+        Task<Result<LoginOutPut>> GetUserAsync(LoginInput input);
+
+        Task<Result> UpdateUserAsync(UpdateUserInput input);
     }
 }

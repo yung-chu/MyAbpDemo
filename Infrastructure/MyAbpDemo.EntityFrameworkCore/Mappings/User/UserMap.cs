@@ -24,6 +24,14 @@ namespace MyAbpDemo.Infrastructure.EFCore
                     sa.Property(p => p.Number).HasColumnName("Number");
                     sa.ToTable("Adress");
                 });
+
+            //并发处理两种方式 1.并发令牌 2.使用时间戳和行级版本号
+
+            //1.并发令牌
+            //https://docs.microsoft.com/zh-cn/ef/core/modeling/concurrency
+            //builder.Property(a => a.UserName).IsConcurrencyToken();
+            //2.时间戳/行版本  修改用户自动在where加上RowVersion
+            builder.Property(a => a.RowVersion).IsRowVersion();
         }
     }
 }

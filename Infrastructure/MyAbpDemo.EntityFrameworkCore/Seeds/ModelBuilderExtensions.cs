@@ -98,13 +98,25 @@ namespace MyAbpDemo.Infrastructure.EFCore
                 }
             };
 
-            modelBuilder.Entity<Post>().HasData(new Post
-            {
-                Id = 1,
-                Title = "下班了",
-                Content = "6.15准时下班",
-                BlogUrl = "www.baidu.com",
-            });
+
+           var posts=new List<Post>
+           {
+               new Post
+               {
+                   Id = 1,
+                   Title = "下班了",
+                   Content = "6.15准时下班",
+                   BlogUrl = "www.baidu.com",
+               }, new Post
+               {
+                   Id = 2,
+                   Title = "过年了",
+                   Content = "2.5过年了",
+                   BlogUrl = "www.baidu.com",
+               }
+           }.ToArray();
+
+            modelBuilder.Entity<Post>().HasData(posts);
 
             #endregion
 
