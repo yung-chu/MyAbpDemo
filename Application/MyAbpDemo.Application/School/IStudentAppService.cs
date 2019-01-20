@@ -58,5 +58,11 @@ namespace MyAbpDemo.Application
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
         Result<List<ExportWithError>> GetExportWithValidateError(IFormFile uploadedFile);
+
+        /// <summary>
+        /// 测试后台工作
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> TestBackgroundJob();
     }
 }
