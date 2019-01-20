@@ -5,10 +5,11 @@ using Abp.Modules;
 using Abp.Reflection.Extensions;
 using Castle.MicroKernel.Registration;
 using MyAbpDemo.ApplicationDto;
+using MyAbpDemo.Infrastructure.EasyNetQ;
 
 namespace MyAbpDemo.Application
 {
-    [DependsOn(typeof(ApplicationDtoModule))]
+    [DependsOn(typeof(ApplicationDtoModule),typeof(EasyNetQModule))]
     public class ApplicationModule : AbpModule
     {
         public override void PreInitialize()

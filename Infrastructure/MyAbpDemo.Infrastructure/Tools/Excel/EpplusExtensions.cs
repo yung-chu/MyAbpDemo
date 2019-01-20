@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -253,22 +254,6 @@ namespace MyAbpDemo.Infrastructure
             //Load the IEnumerable<T> into the sheet, starting from cell A1. Print the column names on row 1
             worksheet.Cells["A1"].LoadFromCollection(list, true);
 
-            //设置列格式
-            //https://q.cnblogs.com/q/65222/
-            foreach (var item in propertyInfos)
-            {
-                var col = propertyInfos.IndexOf(item) + 1;
-                switch (item.PropertyType.Name.ToLower())
-                {
-                    case "decimal":
-                        worksheet.Column(col).Style.Numberformat.Format = "#,##0.00";//保留两位小数
-                        break;
-
-                    case "datetime":
-                        worksheet.Column(col).Style.Numberformat.Format = "yyyy-mm-dd";
-                        break;
-                }
-            }
 
             //获取一个区域，并对该区域进行样式设置
             ExcelBorderStyle borderStyle = ExcelBorderStyle.Thin;
@@ -293,13 +278,41 @@ namespace MyAbpDemo.Infrastructure
                 rng.Style.Border.Right.Color.SetColor(borderColor);
             }
 
-            //Format the header row
+            //设置标题头格式
             using (ExcelRange rng = worksheet.Cells[1, 1, 1, objectColumns.Count()])
             {
                 rng.Style.Font.Bold = true;
                 rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 rng.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(234, 241, 246));  //Set color to dark blue
                 rng.Style.Font.Color.SetColor(Color.FromArgb(51, 51, 51));
+            }
+
+            //设置列格式
+            //https://q.cnblogs.com/q/65222/
+            foreach (var item in propertyInfos)
+            {
+                var col = propertyInfos.IndexOf(item) + 1;
+                switch (item.PropertyType.Name.ToLower())
+                {
+                    case "decimal":
+                        worksheet.Column(col).Style.Numberformat.Format = "#,##0.00";//保留两位小数
+                        break;
+
+                    case "datetime":
+                        worksheet.Column(col).Style.Numberformat.Format = "yyyy-mm-dd";
+                        break;
+                }
+
+                //用于RequiredAttribute字段标红
+                if (item.CustomAttributes.Any(a => a.AttributeType == typeof(RequiredAttribute)))
+                {
+                    int getColorCol = propertyInfos.IndexOf(item) + 1;
+                    using (ExcelRange rng = worksheet.Cells[1, getColorCol, 1, getColorCol])
+                    {
+                        rng.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        rng.Style.Fill.BackgroundColor.SetColor(Color.OrangeRed);
+                    }
+                }
             }
 
             //导出时返回校验错误行标红

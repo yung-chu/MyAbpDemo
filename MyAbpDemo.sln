@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyAbpDemo.Api", "Presentati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyAbpDemo.Infrastructure", "Infrastructure\MyAbpDemo.Infrastructure\MyAbpDemo.Infrastructure.csproj", "{507D9EA5-FE52-4266-A8ED-1D127C98C2F6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyAbpDemo.Infrastructure.EasyNetQ", "Infrastructure\MyAbpDemo.Infrastructure.EasyNetQ\MyAbpDemo.Infrastructure.EasyNetQ.csproj", "{EDE27CEC-37AE-4BEB-85DA-E51ADB89E369}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{507D9EA5-FE52-4266-A8ED-1D127C98C2F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{507D9EA5-FE52-4266-A8ED-1D127C98C2F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{507D9EA5-FE52-4266-A8ED-1D127C98C2F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDE27CEC-37AE-4BEB-85DA-E51ADB89E369}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDE27CEC-37AE-4BEB-85DA-E51ADB89E369}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDE27CEC-37AE-4BEB-85DA-E51ADB89E369}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDE27CEC-37AE-4BEB-85DA-E51ADB89E369}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +79,7 @@ Global
 		{D236CC9A-C3D0-4123-BF07-A6A0D39F4C1B} = {26932E7C-D6F3-43D5-A4F8-C868FE6EBA5B}
 		{5FF7F894-7DCA-4F7D-A496-41D035739CB1} = {96707152-128A-46B1-BA66-8A81716C2100}
 		{507D9EA5-FE52-4266-A8ED-1D127C98C2F6} = {26932E7C-D6F3-43D5-A4F8-C868FE6EBA5B}
+		{EDE27CEC-37AE-4BEB-85DA-E51ADB89E369} = {26932E7C-D6F3-43D5-A4F8-C868FE6EBA5B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9B4B32B9-087D-4D34-A2E2-9F0234771ABD}

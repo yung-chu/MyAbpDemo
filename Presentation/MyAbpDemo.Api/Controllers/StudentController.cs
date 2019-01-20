@@ -53,6 +53,28 @@ namespace MyAbpDemo.Api.Controllers
         }
 
 
+
+        /// <summary>
+        /// 获取学生信息
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">成功</response>
+        /// <response code="400">失败返回Result对象</response>  
+        [HttpGet("TestJob")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
+
+        public async Task<IActionResult> TestBackgroundJob()
+        {
+            var result = await _studentAppService.TestBackgroundJob();
+            if (result.IsSuccess)
+            {
+                return Ok();
+            }
+            return BadRequest(result.BaseResult());
+        }
+  
+
         /// <summary>
         /// 创建学生
         /// </summary>
