@@ -34,6 +34,7 @@ namespace MyAbpDemo.Api.Controllers
 
         /// <summary>
         /// 获取学生信息
+        /// 并执行后台工作BackgroundJob
         /// </summary>
         /// <returns></returns>
         /// <response code="200">成功</response>
@@ -51,8 +52,7 @@ namespace MyAbpDemo.Api.Controllers
             }
             return BadRequest(result.BaseResult());
         }
-
-
+  
         /// <summary>
         /// 创建学生
         /// </summary>

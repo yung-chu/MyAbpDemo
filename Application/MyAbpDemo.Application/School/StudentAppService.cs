@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Abp.Auditing;
 using Abp.AutoMapper;
+using Abp.BackgroundJobs;
 using Abp.Collections.Extensions;
 using Abp.Runtime.Caching;
 using Abp.UI;
@@ -26,22 +27,31 @@ namespace MyAbpDemo.Application
         private readonly ITeacherRepository _teacherRepository;
         private readonly IStudentDomainService _studentDomainService;
         private readonly ICacheManager _cacheManager;
+        private readonly IBackgroundJobManager _backgroundJobManager;
 
-       public StudentAppService(IStudentRepository studentRepository, ITeacherRepository teacherRepository,
-            IStudentDomainService studentDomainService, ICacheManager cacheManager)
+        public StudentAppService(IStudentRepository studentRepository, ITeacherRepository teacherRepository,
+            IStudentDomainService studentDomainService, ICacheManager cacheManager, IBackgroundJobManager backgroundJobManager)
         {
             _studentRepository = studentRepository;
             _teacherRepository = teacherRepository;
             _studentDomainService = studentDomainService;
             _cacheManager = cacheManager;
+            _backgroundJobManager = backgroundJobManager;
         }
 
         public async Task<Result<List<GetStudentListOutput>>> GetStudentListAsync()
         {
             var result = await _studentRepository.GetAll().ProjectTo<GetStudentListOutput>().ToListAsync();
+            //测试后台任务作业
+            var args = new ApiDataSyncJobArgs
+            {
+                TargetParkId = 99
+            };
+
+            await _backgroundJobManager.EnqueueAsync<ApiDataSyncJob, ApiDataSyncJobArgs>(args);
+
             return Result.FromData(result);
         }
-
 
         public async Task<Result<GetStudentListOutput>> GetSingleStudentAsync(int id)
         {
@@ -72,7 +82,7 @@ namespace MyAbpDemo.Application
         /// <returns></returns>
         public async Task<List<ExportStudent>> GetExportStudentListAsync()
         {
-            var result = (await GetStudentListAsync());
+            var result = await GetStudentListAsync();
             return result.MapToList<ExportStudent>();
         }
 
