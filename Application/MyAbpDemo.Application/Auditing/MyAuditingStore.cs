@@ -9,6 +9,9 @@ using MyAbpDemo.Core;
 
 namespace MyAbpDemo.Application
 {
+    /// <summary>
+    /// 参考源码 Abp.Zero.Common Auditing/AuditingStore
+    /// </summary>
     public class MyAuditingStore : IAuditingStore,ITransientDependency
     {
         private readonly IAuditingRepository _auditingRepository;

@@ -12,6 +12,7 @@ using Abp.Collections.Extensions;
 using Abp.Runtime.Caching;
 using Abp.UI;
 using AutoMapper.QueryableExtensions;
+using Castle.Core.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using MyAbpDemo.ApplicationDto;
@@ -47,9 +48,8 @@ namespace MyAbpDemo.Application
             {
                 TargetParkId = 99
             };
-
             await _backgroundJobManager.EnqueueAsync<ApiDataSyncJob, ApiDataSyncJobArgs>(args);
-
+            //Logger.Info("测试后台任务作业"+DateTime.Now.ToLocalTime());
             return Result.FromData(result);
         }
 

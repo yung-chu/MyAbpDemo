@@ -175,12 +175,12 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
             migrationBuilder.InsertData(
                 table: "Teachers",
                 columns: new[] { "Id", "Age", "CreationTime", "CreatorUserId", "DeleterUserId", "DeletionTime", "IsActive", "IsDeleted", "IsReview", "LastModificationTime", "LastModifierUserId", "Name" },
-                values: new object[] { 1L, 18, new DateTime(2019, 1, 14, 10, 7, 26, 312, DateTimeKind.Local), null, null, null, true, false, true, null, null, "朱老师" });
+                values: new object[] { 1L, 18, new DateTime(2019, 1, 22, 11, 43, 5, 739, DateTimeKind.Local), null, null, null, true, false, true, null, null, "朱老师" });
 
             migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "Id", "CreationTime", "CreatorUserId", "DeleterUserId", "DeletionTime", "Emial", "IsActive", "IsDeleted", "LastModificationTime", "LastModifierUserId", "Nickname", "Password", "RowVersion", "UserName" },
-                values: new object[] { 1L, new DateTime(2019, 1, 14, 10, 7, 26, 315, DateTimeKind.Local), null, null, null, "jianlive@sina.com", true, false, null, null, "小名test1", "123", null, "test1" });
+                values: new object[] { 1L, new DateTime(2019, 1, 22, 11, 43, 5, 743, DateTimeKind.Local), null, null, null, "jianlive@sina.com", true, false, null, null, "小名test1", "123", null, "test1" });
 
             migrationBuilder.InsertData(
                 table: "Adress",
@@ -201,8 +201,8 @@ namespace MyAbpDemo.Infrastructure.EFCore.Migrations
                 columns: new[] { "Id", "Age", "CreationTime", "CreatorUserId", "DeleterUserId", "DeletionTime", "IsActive", "IsDeleted", "LastModificationTime", "LastModifierUserId", "LearnLevel", "Name", "TeacherId" },
                 values: new object[,]
                 {
-                    { 1L, 18, new DateTime(2019, 1, 14, 10, 7, 26, 314, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)1, "学生1", 1L },
-                    { 2L, 36, new DateTime(2019, 1, 14, 10, 7, 26, 314, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)4, "学生2", 1L }
+                    { 1L, 18, new DateTime(2019, 1, 22, 11, 43, 5, 741, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)1, "学生1", 1L },
+                    { 2L, 36, new DateTime(2019, 1, 22, 11, 43, 5, 742, DateTimeKind.Local), null, null, null, true, false, null, null, (byte)4, "学生2", 1L }
                 });
 
             migrationBuilder.CreateIndex(

@@ -9,6 +9,9 @@ using MyAbpDemo.Core;
 
 namespace MyAbpDemo.Application
 {
+    /// <summary>
+    /// 后台作业以队列和持久化的方式来排队执行某些任务。
+    /// </summary>
     public class ApiDataSyncJob : BackgroundJob<ApiDataSyncJobArgs>, ITransientDependency
     {
         private readonly ISmtpEmailSenderConfiguration _smtpEmialSenderConfig;

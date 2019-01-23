@@ -22,8 +22,13 @@ using MyAbpDemo.Infrastructure.Api.Filters;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using Abp.Hangfire;
+using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MyAbpDemo.Api.Swagger;
+using MyAbpDemo.Application;
+using MyAbpDemo.Infrastructure.EFCore;
 
 namespace MyAbpDemo.Api
 {
@@ -38,12 +43,17 @@ namespace MyAbpDemo.Api
         //https://www.jianshu.com/p/b9416867e6e6
         public IConfiguration Configuration { get; }
 
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             //获取配置
             services.Configure<JwtSetting>(Configuration.GetSection("JWT"));
+
+            //注入数据库上下文
+            services.AddDbContext<MyAbpDemoDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("Default"));
+            });
 
 
             //添加筛选器
@@ -80,7 +90,6 @@ namespace MyAbpDemo.Api
                 });
              });
 
-
             #region JwtBearer认证
             //https://www.cnblogs.com/weipengpeng/p/9651336.html
 
@@ -110,6 +119,11 @@ namespace MyAbpDemo.Api
 
             #endregion
 
+            //HangFire使用SQL Server 作为存储
+            services.AddHangfire(config =>
+            {
+                config.UseSqlServerStorage(Configuration.GetConnectionString("Default"));
+            });
 
             //ABP集成到ASP.NET Core和依赖注入，在最后调用
             return services.AddAbp<ApiModule>(
@@ -123,17 +137,14 @@ namespace MyAbpDemo.Api
                     f => f.UseAbpNLog().WithConfig("NLog.config")
                 )
             );
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {  
-            
             //初始化ABP框架和所有其他模块，这个应该首先被调用
             app.UseAbp();
             
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -149,13 +160,24 @@ namespace MyAbpDemo.Api
             app.UseMvc();
             app.UseStaticFiles();
 
+            //配置Hangfire
+            app.UseHangfireServer();
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                //Authorization = new[] { new AbpHangfireAuthorizationFilter() }
+            });
+
+            //https://blog.csdn.net/li7724653/article/details/80507977
+            //定时任务执行(Recurring jobs)
+            RecurringJob.AddOrUpdate<IMessageAppService>(a=>a.SendMessage("hello message"),Cron.Daily(15,45));
+
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
-
         }
     }
 }

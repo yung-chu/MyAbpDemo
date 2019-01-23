@@ -9,9 +9,6 @@ using Microsoft.AspNetCore.Http;
 using MyAbpDemo.ApplicationDto;
 using MyAbpDemo.Infrastructure;
 
-//1: 导入日志的命名空间，Castle.Core.Logging
-
-
 namespace MyAbpDemo.Api.Controllers
 {
  

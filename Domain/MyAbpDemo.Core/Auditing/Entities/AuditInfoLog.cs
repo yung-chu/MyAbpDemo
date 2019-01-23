@@ -86,7 +86,6 @@ namespace MyAbpDemo.Core
         public static AuditInfoLog Create(AuditInfo auditInfo)
         {
             var exceptionOrSuccessMessage = auditInfo.Exception?.Message;
-     
             return new AuditInfoLog
             {
                 TenantId = auditInfo.TenantId,

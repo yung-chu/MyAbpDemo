@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Abp.BackgroundJobs;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using MyAbpDemo.ApplicationDto;

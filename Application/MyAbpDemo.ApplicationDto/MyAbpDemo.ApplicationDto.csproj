@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Domain\MyAbpDemo.Core\MyAbpDemo.Core.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\MyAbpDemo.EntityFrameworkCore\MyAbpDemo.Infrastructure.EFCore.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\MyAbpDemo.Infrastructure.EntityFrameworkCore\MyAbpDemo.Infrastructure.EFCore.csproj" />
     <ProjectReference Include="..\..\Infrastructure\MyAbpDemo.Infrastructure\MyAbpDemo.Infrastructure.csproj" />
   </ItemGroup>
 
