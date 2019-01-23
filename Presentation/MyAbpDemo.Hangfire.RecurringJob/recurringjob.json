@@ -5,28 +5,20 @@
     "cron-expression": "*/5 * * * *",
     "timezone": "China Standard Time",
     "queue": "jobs"
+  },
+  {
+    "job-name": "My Job2",
+    "job-type": "MyAbpDemo.Application.MyJob2, MyAbpDemo.Application",
+    "cron-expression": "*/5 * * * *",
+    "queue": "apis",
+    "job-data": {
+      "IntVal": 1,
+      "StringVal": "abcdef",
+      "BooleanVal": true,
+      "SimpleObject": {
+        "Name": "Foo",
+        "Age": 100
+      }
+    }
   }
 ]
-  //,
-  //{
-  //  "job-name": "My Job2",
-  //  "job-type": "Hangfire.Samples.MyJob2, Hangfire.Samples",
-  //  "cron-expression": "*/5 * * * *",
-  //  "job-data": {
-  //    "IntVal": 1,
-  //    "StringVal": "abcdef",
-  //    "BooleanVal": true,
-  //    "SimpleObject": {
-  //      "Name": "Foo",
-  //      "Age": 100
-  //    }
-  //  }
-  //},
-  //{
-  //  "job-name": "Long Running Job",
-  //  "job-type": "Hangfire.Samples.LongRunningJob, Hangfire.Samples",
-  //  "cron-expression": "*/2 * * * *",
-  //  "job-data": {
-  //    "RunningTimes": 300
-  //  }
-  //}

@@ -78,7 +78,9 @@ namespace MyAbpDemo.Hangfire.RecurringJob
                 //Authorization = new[] { new AbpHangfireAuthorizationFilter() }
             });
 
+            app.UseHttpsRedirection();
             app.UseMvc();
+
         }
     }
 }

@@ -14,6 +14,7 @@
     <PackageReference Include="Abp.RedisCache" Version="4.0.2" />
     <PackageReference Include="Abp.Castle.NLog" Version="3.8.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.WindowsServices" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.6.20" />
     <PackageReference Include="NLog" Version="4.5.11" />
@@ -27,6 +28,9 @@
 
   <ItemGroup>
     <Content Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="recurringjob.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
