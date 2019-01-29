@@ -18,7 +18,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MyAbpDemo.Infrastructure;
 using MyAbpDemo.Infrastructure.Api;
-using MyAbpDemo.Infrastructure.Api.Filters;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
@@ -64,6 +63,10 @@ namespace MyAbpDemo.Api
                     option.Filters.Add(typeof(MyAbpExceptionFilter));
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddJsonOptions(options => //json日期格式化
+                {
+                    options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+                })
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
 
             //注册swagger

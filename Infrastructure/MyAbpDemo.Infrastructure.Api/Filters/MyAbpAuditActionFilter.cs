@@ -17,7 +17,7 @@ using Abp.Dependency;
 using Abp.Runtime.Session;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace MyAbpDemo.Infrastructure
+namespace MyAbpDemo.Infrastructure.Api
 {
     /// <summary>
     /// 源码分析

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using MyAbpDemo.Application;
 using MyAbpDemo.ApplicationDto;
 using MyAbpDemo.Infrastructure;
@@ -17,6 +20,7 @@ namespace MyAbpDemo.Api.Controllers
         {
             _postAppService = postAppService;
         }
+
 
         /// <summary>
         /// 获取某个blog的post列表

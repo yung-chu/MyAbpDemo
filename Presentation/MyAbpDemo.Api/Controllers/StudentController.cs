@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Abp.AspNetCore.Mvc.ExceptionHandling;
 using Abp.Auditing;
 using Castle.LoggingFacility.MsLogging;
+using MyAbpDemo.Core;
 
 namespace MyAbpDemo.Api.Controllers
 {
@@ -102,9 +103,22 @@ namespace MyAbpDemo.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Export()
         {
-            string path = $"TempExport\\学生-{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-            var list = await _studentAppService.GetExportStudentListAsync();
-            return CommomExport(path, list,new List<CellPosition>());
+            string fileName = "学生";
+            //var list = await _studentAppService.GetExportStudentListAsync();
+
+            var list = new List<ExportStudent>();
+            for (int i = 1; i <= 21; i++)
+            {
+                list.Add(new ExportStudent
+                {
+                    Name="学生"+i,
+                    Age=10,
+                    LearnLevel="优",
+                    TeacherName="老师"+i
+                });
+            }
+
+            return CommomExport(fileName, list,new List<CellPosition>());
         }
 
 
@@ -239,26 +253,61 @@ namespace MyAbpDemo.Api.Controllers
         private IActionResult CommomExport<T>(string fileName, IEnumerable<T> list, List<CellPosition> cellPositions) where T : new()
         {
             string sWebRootFolder = _hostingEnvironment.WebRootPath;
-            string path = $"TempExport\\{fileName}-{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            string directoryName = "TempExport";
+            string directoryPath = Path.Combine(sWebRootFolder, directoryName);
+            const int maxCount = 10;
 
             try
             {
-             
-                FileInfo fileInfo = new FileInfo(Path.Combine(sWebRootFolder, path));
-                if (!Directory.Exists(fileInfo.DirectoryName))
+                string currentTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+                if (!Directory.Exists(directoryPath))
                 {
-                    Directory.CreateDirectory(fileInfo.DirectoryName);
+                    Directory.CreateDirectory(directoryPath);
                 }
 
-                EpplusHelper.Export(list, fileInfo, cellPositions);
-                new FileExtensionContentTypeProvider().TryGetContentType(path, out string contentType);
-                return File(path, contentType, Path.GetFileName(path));
+                if (list.Count()>= maxCount)
+                {
+                    int fileCount = list.Count() / maxCount + 1;
+
+                    for (int i = 1; i <= fileCount; i++)
+                    {
+                        string path = $"{directoryName}\\{fileName}-{i}-{currentTime}.xlsx";
+                        FileInfo fileInfo = new FileInfo(Path.Combine(sWebRootFolder, path));
+
+                        string sa = fileInfo.DirectoryName;
+
+
+                        EpplusHelper.Export(list, fileInfo, cellPositions);
+                        new FileExtensionContentTypeProvider().TryGetContentType(path, out string contentType);
+                        return File(path, contentType, Path.GetFileName(path));
+                    }
+                }
+             
+               return  ExportExcel(directoryName, fileName, string.Empty, currentTime, sWebRootFolder, list,
+                    cellPositions);
+                
             }
             catch (Exception e)
             {
+                Logger.Error("导出失败"+e.Message);
                 return BadRequest("导出失败");
             }
         }
+
+
+
+
+        public IActionResult ExportExcel<T>(string directoryName,string fileName,string fileCount,string currentTime, string sWebRootFolder, IEnumerable<T> list,List<CellPosition> cellPositions) where T : new()
+        {
+            string path = $"{directoryName}\\{fileName}-{fileCount}-{currentTime}.xlsx";
+            FileInfo fileInfo = new FileInfo(Path.Combine(sWebRootFolder, path));
+            EpplusHelper.Export(list, fileInfo, cellPositions);
+            new FileExtensionContentTypeProvider().TryGetContentType(path, out string contentType);
+            return File(path, contentType, Path.GetFileName(path));
+        }
+
+
+
 
 
         /// <summary>

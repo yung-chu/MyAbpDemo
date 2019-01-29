@@ -21,7 +21,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace MyAbpDemo.Infrastructure.Api.Filters
+namespace MyAbpDemo.Infrastructure.Api
 {
     /// <summary>
     /// http://www.cnblogs.com/myzony/archive/2018/08/11/9460021.html

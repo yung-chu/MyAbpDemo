@@ -164,7 +164,6 @@ namespace MyAbpDemo.Application
                 result.Code = ResultCode.ParameterFailed;
                 return result;
             }
-
             if (!uploadedFile.FileName.EndsWith("xlsx"))
             {
                 result.Message = "请选择上传后缀xlsx格式的excel";
@@ -374,7 +373,6 @@ namespace MyAbpDemo.Application
 
             return cellPositions;
         }
-
 
         #endregion
     }
