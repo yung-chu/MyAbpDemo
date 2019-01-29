@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <!--依赖框架的部署 (FDD)-->
+    <!--https://docs.microsoft.com/zh-cn/aspnet/core/host-and-deploy/windows-service?view=aspnetcore-2.2#framework-dependent-deployment-fdd-->
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <UseAppHost>true</UseAppHost>
+    <SelfContained>false</SelfContained>
+    <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +35,9 @@
 
   <ItemGroup>
     <Content Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Properties\launchSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="recurringjob.json">

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -60,10 +61,11 @@ namespace MyAbpDemo.Hangfire.RecurringJob
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseNLog()
-                //.ConfigureLogging((hostingContext, logging) =>
-                //{
-                //    logging.AddEventLog();
-                //})
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    // Configure the app here.
+                })
+                .UseKestrel(options => { options.Listen(IPAddress.Any, 9000); })
                 .UseStartup<Startup>();
     }
 }

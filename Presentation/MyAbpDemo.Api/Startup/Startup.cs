@@ -55,7 +55,6 @@ namespace MyAbpDemo.Api
                 options.UseSqlServer(Configuration.GetConnectionString("Default"));
             });
 
-
             //添加筛选器
             //https://docs.microsoft.com/zh-cn/aspnet/core/mvc/controllers/filters?view=aspnetcore-2.1#action-filters
             services.AddMvc(option =>
