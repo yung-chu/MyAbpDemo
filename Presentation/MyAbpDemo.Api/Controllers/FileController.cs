@@ -18,9 +18,7 @@ namespace MyAbpDemo.Api.Controllers
         private static HttpClient Client { get; } = new HttpClient();
 
         /// <summary>
-        /// 动态生成zip文件
-        /// https://blog.stephencleary.com/2016/11/streaming-zip-on-aspnet-core.html
-        /// https://github.com/StephenClearyExamples/AsyncDynamicZip/tree/core-ziparchive
+        /// 异步动态生成zip文件
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -51,6 +49,10 @@ namespace MyAbpDemo.Api.Controllers
         }
     }
 
+    /// <summary>
+    /// https://blog.stephencleary.com/2016/11/streaming-zip-on-aspnet-core.html
+    /// https://github.com/StephenClearyExamples/AsyncDynamicZip/tree/core-ziparchive
+    /// </summary>
     public class WriteOnlyStreamWrapper : Stream
     {
         private readonly Stream _stream;

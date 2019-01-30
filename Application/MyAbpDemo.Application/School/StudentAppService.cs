@@ -77,17 +77,17 @@ namespace MyAbpDemo.Application
         }
 
         /// <summary>
-        /// 
+        /// 导出
         /// </summary>
         /// <returns></returns>
         public async Task<List<ExportStudent>> GetExportStudentListAsync()
         {
             var result = await GetStudentListAsync();
-            return result.MapToList<ExportStudent>();
+            return result.Data.MapToList<ExportStudent>();
         }
 
         /// <summary>
-        /// 
+        /// 创建
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>

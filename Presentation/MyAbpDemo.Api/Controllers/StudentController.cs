@@ -8,14 +8,19 @@ using MyAbpDemo.ApplicationDto;
 using MyAbpDemo.Infrastructure;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Abp.AspNetCore.Mvc.ExceptionHandling;
 using Abp.Auditing;
 using Castle.LoggingFacility.MsLogging;
+using EasyNetQ;
+using Microsoft.Net.Http.Headers;
 using MyAbpDemo.Core;
+using MyAbpDemo.Infrastructure.Api;
 
 namespace MyAbpDemo.Api.Controllers
 {
@@ -98,27 +103,27 @@ namespace MyAbpDemo.Api.Controllers
         /// <returns></returns>
         /// <response code="200">成功</response>
         /// <response code="400">失败返回Result对象</response>  
-        [HttpGet("export")]
+        [HttpGet("exports")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Export()
         {
             string fileName = "学生";
-            //var list = await _studentAppService.GetExportStudentListAsync();
+            var list = await _studentAppService.GetExportStudentListAsync();
 
-            var list = new List<ExportStudent>();
-            for (int i = 1; i <= 21; i++)
-            {
-                list.Add(new ExportStudent
-                {
-                    Name="学生"+i,
-                    Age=10,
-                    LearnLevel="优",
-                    TeacherName="老师"+i
-                });
-            }
+            //var list = new List<ExportStudent>();
+            //for (int i = 1; i <= 21; i++)
+            //{
+            //    list.Add(new ExportStudent
+            //    {
+            //        Name="学生"+i,
+            //        Age=10,
+            //        LearnLevel="优",
+            //        TeacherName="老师"+i
+            //    });
+            //}
 
-            return CommomExport(fileName, list,new List<CellPosition>());
+            return  CommomExport(fileName, list,new List<CellPosition>());
         }
 
 
@@ -180,7 +185,7 @@ namespace MyAbpDemo.Api.Controllers
             var result = _studentAppService.GetExportWithValidateError(uploadedFile);
             if (result.IsSuccess)
             {
-                return CommomExport(path, result.Data,new List<CellPosition>());
+                return  CommomExport(path, result.Data,new List<CellPosition>());
             }
 
             return BadRequest(result.BaseResult());
@@ -204,7 +209,7 @@ namespace MyAbpDemo.Api.Controllers
             {
                 var dictionary = result.Data;
 
-                return CommomExport(fileName, dictionary.Keys.First(), dictionary.Values.First());
+                return  CommomExport(fileName, dictionary.Keys.First(), dictionary.Values.First());
             }
 
             return BadRequest(result.BaseResult());
@@ -250,7 +255,7 @@ namespace MyAbpDemo.Api.Controllers
         /// <param name="list"></param>
         /// <param name="cellPositions"></param>
         /// <returns></returns>
-        private IActionResult CommomExport<T>(string fileName, IEnumerable<T> list, List<CellPosition> cellPositions) where T : new()
+        private  IActionResult CommomExport<T>(string fileName, IEnumerable<T> list, List<CellPosition> cellPositions) where T : new()
         {
             string sWebRootFolder = _hostingEnvironment.WebRootPath;
             string directoryName = "TempExport";
@@ -259,33 +264,41 @@ namespace MyAbpDemo.Api.Controllers
 
             try
             {
-                string currentTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+                var currentTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+                IActionResult actionResult = null;
                 if (!Directory.Exists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);
                 }
 
-                if (list.Count()>= maxCount)
+                //多文件压缩
+                if (list.Count()> maxCount)
                 {
                     int fileCount = list.Count() / maxCount + 1;
+                    var filenamesAndStream = new ConcurrentDictionary<string, Stream>();
 
                     for (int i = 1; i <= fileCount; i++)
                     {
-                        string path = $"{directoryName}\\{fileName}-{i}-{currentTime}.xlsx";
-                        FileInfo fileInfo = new FileInfo(Path.Combine(sWebRootFolder, path));
-
-                        string sa = fileInfo.DirectoryName;
-
-
-                        EpplusHelper.Export(list, fileInfo, cellPositions);
-                        new FileExtensionContentTypeProvider().TryGetContentType(path, out string contentType);
-                        return File(path, contentType, Path.GetFileName(path));
+                        //导出excel
+                        var fileFullName = $"{fileName}-{i}-{currentTime}.xlsx";
+                        var fileInfo = new FileInfo(Path.Combine(sWebRootFolder, Path.Combine(directoryName, fileFullName)));
+                        var filterList = list.Skip((i - 1) * maxCount).Take(maxCount);
+                        EpplusHelper.Export(filterList, fileInfo, cellPositions);
+                        
+                        //构造 filenamesAndStream
+                        var fileStream = System.IO.File.OpenRead(fileInfo.FullName);
+                        filenamesAndStream.TryAdd(fileFullName, fileStream);
                     }
+
+                    actionResult =ReturnZipFileResult(filenamesAndStream,fileName);
                 }
-             
-               return  ExportExcel(directoryName, fileName, string.Empty, currentTime, sWebRootFolder, list,
-                    cellPositions);
-                
+                else//单文件
+                {
+                    var fileNamePath = Path.Combine(directoryName, $"{fileName}-{currentTime}.xlsx");
+                    actionResult = ExportExcel(sWebRootFolder,fileNamePath, list,cellPositions);
+                }
+
+                return actionResult;
             }
             catch (Exception e)
             {
@@ -294,20 +307,49 @@ namespace MyAbpDemo.Api.Controllers
             }
         }
 
-
-
-
-        public IActionResult ExportExcel<T>(string directoryName,string fileName,string fileCount,string currentTime, string sWebRootFolder, IEnumerable<T> list,List<CellPosition> cellPositions) where T : new()
+        /// <summary>
+        ///多文件压缩
+        /// </summary>
+        /// <param name="filenamesAndStream"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private IActionResult ReturnZipFileResult(ConcurrentDictionary<string, Stream> filenamesAndStream,string fileName)
         {
-            string path = $"{directoryName}\\{fileName}-{fileCount}-{currentTime}.xlsx";
-            FileInfo fileInfo = new FileInfo(Path.Combine(sWebRootFolder, path));
+            return new FileCallbackActionResult(new MediaTypeHeaderValue("application/octet-stream"), async (outputStream, _) =>
+            {
+                using (var zipArchive = new ZipArchive(new WriteOnlyStreamWrapper(outputStream), ZipArchiveMode.Create))
+                {
+                    foreach (var kvp in filenamesAndStream)
+                    {
+                        var zipEntry = zipArchive.CreateEntry(kvp.Key);
+                        using (var zipStream = zipEntry.Open())
+                        {
+                            await kvp.Value.CopyToAsync(zipStream);
+                        }
+                    }
+                }
+            })
+            {
+                FileDownloadName = $"{fileName}.zip"
+            };
+        }
+
+        /// <summary>
+        /// 单文件导出
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="webRootFolder">根目录</param>
+        /// <param name="path">相对路径</param>
+        /// <param name="list">数据源</param>
+        /// <param name="cellPositions"></param>
+        /// <returns></returns>
+        private IActionResult ExportExcel<T>(string webRootFolder, string path, IEnumerable<T> list,List<CellPosition> cellPositions) where T : new()
+        {
+            FileInfo fileInfo = new FileInfo(Path.Combine(webRootFolder, path));
             EpplusHelper.Export(list, fileInfo, cellPositions);
             new FileExtensionContentTypeProvider().TryGetContentType(path, out string contentType);
             return File(path, contentType, Path.GetFileName(path));
         }
-
-
-
 
 
         /// <summary>
